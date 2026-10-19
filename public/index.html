@@ -2456,8 +2456,11 @@ node src/cli.js --text "Testing browser" --visible</div>
       const raw = document.getElementById('cookie-json-input').value.trim();
       if (!raw) return showToast('Silakan paste JSON cookie terlebih dahulu!', 'info');
 
+      const targetPlatform = activeModalPlatform;
+      if (!targetPlatform) return showToast('Platform tidak valid', 'error');
+
       try {
-        const res = await fetch(`/api/cookie/${activeModalPlatform}`, {
+        const res = await fetch(`/api/cookie/${targetPlatform}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ cookies: raw })
@@ -2466,7 +2469,7 @@ node src/cli.js --text "Testing browser" --visible</div>
         if (data.success) {
           closeCookieModal();
           loadStatus();
-          showToast(`Cookie ${activeModalPlatform.toUpperCase()} berhasil disimpan!`, 'success');
+          showToast(`Cookie ${targetPlatform.toUpperCase()} berhasil disimpan!`, 'success');
         } else {
           showToast('Error: ' + data.error, 'error');
         }
