@@ -1,0 +1,2722 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SocialHub Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card: #111827;
+      --card-border: #1f2937;
+      --text: #f9fafb;
+      --muted: #9ca3af;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: rgba(17, 24, 39, 0.8);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--card-border);
+      padding: 16px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 24px;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 32px;
+    }
+
+    @media (max-width: 900px) {
+      .container { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Composer Tabs & Mode */
+    .composer-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .tab-btn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+      background: #141d2e;
+      border: 2px solid var(--card-border);
+      border-radius: 12px;
+      cursor: pointer;
+      color: var(--muted);
+      transition: all 0.2s ease;
+      text-align: left;
+    }
+
+    .tab-btn:hover {
+      background: #1e293b;
+      color: var(--text);
+    }
+
+    .tab-btn.active {
+      border-color: var(--accent);
+      background: rgba(59, 130, 246, 0.12);
+      color: #fff;
+    }
+
+    .tab-icon {
+      font-size: 24px;
+    }
+
+    .tab-heading {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .tab-btn.active .tab-heading {
+      color: #93c5fd;
+    }
+
+    .tab-subheading {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .platform-section-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #94a3b8;
+      margin: 14px 0 8px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .badge-req {
+      font-size: 10px;
+      font-weight: 700;
+      background: rgba(245, 158, 11, 0.2);
+      color: #fbbf24;
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid rgba(245, 158, 11, 0.4);
+    }
+
+    .badge-opt {
+      font-size: 10px;
+      font-weight: 600;
+      background: rgba(100, 116, 139, 0.2);
+      color: #cbd5e1;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .mode-notice {
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Composer Section */
+    .platform-selector {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .platform-chip {
+      flex: 1 1 calc(33.333% - 10px);
+      min-width: 140px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px;
+      background: #1e293b;
+      border: 2px solid transparent;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+
+    .platform-chip.active {
+      border-color: var(--accent);
+      background: rgba(59, 130, 246, 0.15);
+      color: #93c5fd;
+    }
+
+    .platform-chip.disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    textarea {
+      width: 100%;
+      height: 180px;
+      background: #0d131f;
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 16px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 15px;
+      line-height: 1.6;
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    textarea:focus {
+      border-color: var(--accent);
+    }
+
+    /* Link & Media Input Sections */
+    .form-group {
+      margin-top: 14px;
+    }
+
+    .form-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .input-field {
+      width: 100%;
+      background: #0d131f;
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .input-field:focus {
+      border-color: var(--accent);
+    }
+
+    .media-dropzone {
+      border: 2px dashed var(--card-border);
+      border-radius: 12px;
+      padding: 18px;
+      text-align: center;
+      cursor: pointer;
+      background: rgba(13, 19, 31, 0.6);
+      transition: all 0.2s ease;
+      margin-top: 6px;
+    }
+
+    .media-dropzone:hover, .media-dropzone.dragover {
+      border-color: var(--accent);
+      background: rgba(59, 130, 246, 0.08);
+    }
+
+    .media-preview-box {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px;
+      background: #182234;
+      border-radius: 10px;
+      margin-top: 10px;
+      border: 1px solid var(--card-border);
+    }
+
+    .media-preview-content {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      overflow: hidden;
+    }
+
+    .media-thumb {
+      width: 54px;
+      height: 54px;
+      border-radius: 8px;
+      object-fit: cover;
+      background: #000;
+    }
+
+    .btn-remove-media {
+      background: rgba(239, 68, 68, 0.2);
+      color: #f87171;
+      border: none;
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+
+    .btn-remove-media:hover {
+      background: rgba(239, 68, 68, 0.4);
+    }
+
+    .composer-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 16px;
+    }
+
+    .char-count {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .btn:hover { background: var(--accent-hover); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-secondary {
+      background: #374151;
+    }
+    .btn-secondary:hover { background: #4b5563; }
+
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 12px;
+      border-radius: 8px;
+    }
+
+    /* Accounts Management (Right column) */
+    .account-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px;
+      background: #182234;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      border: 1px solid #1e293b;
+    }
+
+    .account-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .platform-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .icon-threads { background: #000; border: 1px solid #333; }
+    .icon-twitter { background: #000; border: 1px solid #333; }
+    .icon-facebook { background: #1877f2; }
+    .icon-instagram { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
+    .icon-tiktok { background: #000; border: 1px solid #25f4ee; }
+    .icon-linkedin { background: #0077b5; }
+    .icon-youtube { background: #ff0000; }
+
+    .account-name {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .status-badge {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-weight: 600;
+      display: inline-block;
+      margin-top: 2px;
+    }
+
+    .status-badge.connected { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+    .status-badge.disconnected { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+
+    /* Modal Cookie */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-backdrop.show { display: flex; }
+
+    .modal {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      width: 90%;
+      max-width: 520px;
+      padding: 24px;
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .modal textarea {
+      height: 140px;
+      margin: 12px 0 20px 0;
+      font-size: 12px;
+      font-family: monospace;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    /* Documentation Modal & Components */
+    .btn-doc {
+      background: rgba(59, 130, 246, 0.15);
+      color: #93c5fd;
+      border: 1px solid rgba(59, 130, 246, 0.35);
+      border-radius: 10px;
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+    .btn-doc:hover {
+      background: rgba(59, 130, 246, 0.28);
+      border-color: var(--accent);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+
+    .btn-ai-settings {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(168, 85, 247, 0.2));
+      color: #d8b4fe;
+      border: 1px solid rgba(192, 132, 252, 0.45);
+      border-radius: 10px;
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+    .btn-ai-settings:hover {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.35), rgba(168, 85, 247, 0.35));
+      border-color: #e9d5ff;
+      color: #fff;
+      transform: translateY(-1px);
+    }
+
+    .btn-settings-chip {
+      background: rgba(147, 197, 253, 0.12);
+      border: 1px solid rgba(147, 197, 253, 0.3);
+      color: #93c5fd;
+      border-radius: 8px;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s;
+    }
+    .btn-settings-chip:hover {
+      background: rgba(147, 197, 253, 0.25);
+      color: #fff;
+    }
+
+    .ai-options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 10px 0;
+    }
+
+    .ai-provider-card {
+      background: #0f172a;
+      border: 2px solid var(--card-border);
+      border-radius: 12px;
+      padding: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+    .ai-provider-card:hover {
+      border-color: #3b82f6;
+      background: #131f37;
+    }
+    .ai-provider-card.active {
+      border-color: #3b82f6;
+      background: rgba(59, 130, 246, 0.14);
+    }
+
+    .provider-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .ai-provider-card.active .provider-title {
+      color: #93c5fd;
+    }
+    .provider-desc {
+      font-size: 11.5px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .custom-api-box {
+      background: #0b111e;
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 10px;
+    }
+
+    .preset-chips-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 6px 0 12px 0;
+    }
+
+    .preset-chip {
+      background: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.25);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 11px;
+      color: #93c5fd;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.15s;
+    }
+    .preset-chip:hover {
+      background: rgba(59, 130, 246, 0.3);
+      color: #fff;
+      border-color: #60a5fa;
+    }
+
+    .input-with-action {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .input-with-action input {
+      padding-right: 40px;
+    }
+    .btn-toggle-eye {
+      position: absolute;
+      right: 10px;
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 14px;
+      padding: 4px;
+    }
+    .btn-toggle-eye:hover { color: #fff; }
+
+    .test-feedback {
+      margin-top: 10px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      line-height: 1.4;
+      display: none;
+    }
+    .test-feedback.success {
+      display: block;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      color: #a7f3d0;
+    }
+    .test-feedback.error {
+      display: block;
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      color: #fecaca;
+    }
+    .test-feedback.loading {
+      display: block;
+      background: rgba(59, 130, 246, 0.15);
+      border: 1px solid rgba(59, 130, 246, 0.35);
+      color: #bfdbfe;
+    }
+
+    .modal-lg {
+      max-width: 880px;
+      max-height: 88vh;
+      display: flex;
+      flex-direction: column;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .modal-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--card-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #131c2e;
+    }
+
+    .modal-body {
+      padding: 24px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .doc-nav {
+      display: flex;
+      gap: 8px;
+      border-bottom: 1px solid var(--card-border);
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      overflow-x: auto;
+    }
+
+    .doc-nav-btn {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .doc-nav-btn:hover {
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+    }
+
+    .doc-nav-btn.active {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .doc-card {
+      background: #141e30;
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 18px 20px;
+      margin-bottom: 16px;
+      line-height: 1.6;
+      font-size: 13.5px;
+    }
+
+    .doc-step-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 50%;
+      font-size: 12px;
+      font-weight: 700;
+      margin-right: 8px;
+    }
+
+    .doc-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0;
+      font-size: 13px;
+    }
+
+    .doc-table th, .doc-table td {
+      border: 1px solid var(--card-border);
+      padding: 10px 14px;
+      text-align: left;
+    }
+
+    .doc-table th {
+      background: #0f172a;
+      color: #cbd5e1;
+      font-weight: 600;
+    }
+
+    .doc-table tr:nth-child(even) {
+      background: rgba(255,255,255,0.02);
+    }
+
+    .code-box {
+      background: #090d16;
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-family: monospace;
+      font-size: 12px;
+      color: #38bdf8;
+      margin: 8px 0;
+      overflow-x: auto;
+    }
+
+    /* AI Toolbar & Studio */
+    .ai-toolbar {
+      background: linear-gradient(135deg, rgba(30, 58, 138, 0.35), rgba(88, 28, 135, 0.35));
+      border: 1px solid rgba(147, 197, 253, 0.25);
+      border-radius: 14px;
+      padding: 14px 18px;
+      margin-bottom: 20px;
+    }
+
+    .ai-toolbar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .ai-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #93c5fd;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .ai-badge {
+      font-size: 10px;
+      background: linear-gradient(135deg, #3b82f6, #a855f7);
+      color: #fff;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-weight: 700;
+    }
+
+    .ai-btn-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    @media (max-width: 650px) {
+      .ai-btn-grid { grid-template-columns: 1fr; }
+    }
+
+    .btn-ai-action {
+      background: rgba(17, 24, 39, 0.7);
+      border: 1px solid rgba(147, 197, 253, 0.2);
+      border-radius: 10px;
+      padding: 10px 12px;
+      color: #f1f5f9;
+      cursor: pointer;
+      font-size: 12.5px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .btn-ai-action:hover {
+      background: rgba(59, 130, 246, 0.25);
+      border-color: #60a5fa;
+      color: #fff;
+      transform: translateY(-1px);
+    }
+
+    .btn-ai-action.bundle {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.25), rgba(168, 85, 247, 0.25));
+      border-color: rgba(168, 85, 247, 0.4);
+      color: #e9d5ff;
+    }
+
+    .btn-ai-action.bundle:hover {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.4), rgba(168, 85, 247, 0.4));
+      border-color: #c084fc;
+      color: #fff;
+    }
+
+    .ai-select {
+      width: 100%;
+      background: #0d131f;
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 13.5px;
+      outline: none;
+      margin-top: 4px;
+    }
+
+    .ai-select:focus {
+      border-color: var(--accent);
+    }
+
+    .ai-checkbox-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #cbd5e1;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .ai-tags-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+      margin-bottom: 8px;
+    }
+
+    .ai-tag-chip {
+      background: rgba(59, 130, 246, 0.12);
+      border: 1px solid rgba(59, 130, 246, 0.25);
+      border-radius: 6px;
+      padding: 3px 8px;
+      font-size: 11px;
+      color: #93c5fd;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .ai-tag-chip:hover {
+      background: rgba(59, 130, 246, 0.28);
+      border-color: #60a5fa;
+      color: #fff;
+    }
+
+    /* Toast Notification System */
+    .toast-container {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .toast-item {
+      pointer-events: auto;
+      background: #1e293b;
+      color: #f8fafc;
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 14px 20px;
+      font-size: 13.5px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
+      transform: translateX(120%);
+      opacity: 0;
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      max-width: 420px;
+    }
+
+    .toast-item.show {
+      transform: translateX(0);
+      opacity: 1;
+    }
+
+    .toast-item.success {
+      border-left: 4px solid #10b981;
+      background: #0f231e;
+      color: #a7f3d0;
+    }
+
+    .toast-item.error {
+      border-left: 4px solid #ef4444;
+      background: #27141b;
+      color: #fecaca;
+    }
+
+    .toast-item.info {
+      border-left: 4px solid #3b82f6;
+      background: #121e33;
+      color: #bfdbfe;
+    }
+
+    /* History table */
+    .history-card {
+      margin-top: 32px;
+      grid-column: 1 / -1;
+    }
+
+    .history-item {
+      border-bottom: 1px solid var(--card-border);
+      padding: 16px 0;
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .history-item:last-child { border-bottom: none; }
+
+    .history-text {
+      font-size: 14px;
+      color: #e5e7eb;
+      white-space: pre-line;
+      flex: 1;
+    }
+
+    .history-meta {
+      font-size: 12px;
+      color: var(--muted);
+      text-align: right;
+      min-width: 180px;
+    }
+
+    .result-pill {
+      display: inline-block;
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-left: 4px;
+    }
+    .result-pill.ok { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+    .result-pill.err { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <div class="brand-logo">⚡</div>
+      <div>
+        <h2>SocialHub Manager</h2>
+        <p style="font-size: 12px; color: var(--muted);">Multi-Platform Cookie Publisher</p>
+      </div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <button type="button" class="btn-ai-settings" onclick="openAISettingsModal()">
+        <span>⚙️ Pengaturan AI</span>
+      </button>
+      <button type="button" class="btn-doc" onclick="openDocModal()">
+        <span>📚 Panduan & Tutorial</span>
+      </button>
+      <div style="font-size: 13px; color: var(--muted);">
+        Server: <span style="color: var(--success); font-weight: 600;">● Online</span> (Port 3456)
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- Left Column: Composer -->
+    <div class="card">
+      <div class="composer-tabs">
+        <button type="button" class="tab-btn active" id="tab-btn-text" onclick="setComposerMode('text')">
+          <div class="tab-icon">📝</div>
+          <div>
+            <div class="tab-heading">Mode Teks & Status</div>
+            <div class="tab-subheading">Threads, X/Twitter, FB (Mikroblog)</div>
+          </div>
+        </button>
+        <button type="button" class="tab-btn" id="tab-btn-media" onclick="setComposerMode('media')">
+          <div class="tab-icon">📸</div>
+          <div>
+            <div class="tab-heading">Mode Media Visual</div>
+            <div class="tab-subheading">Instagram, TikTok (+ Cross-post)</div>
+          </div>
+        </button>
+      </div>
+
+      <!-- Mode 1: Teks / Status Platforms -->
+      <div id="section-platforms-text">
+        <div class="platform-section-title">
+          <span>Pilih Platform Teks:</span>
+          <span class="badge-opt">Teks / Link Bebas</span>
+        </div>
+        <div class="platform-selector">
+          <div class="platform-chip active" id="chip-text-threads" onclick="toggleTextPlatform('threads')">
+            <span>🧵 Threads</span>
+          </div>
+          <div class="platform-chip active" id="chip-text-twitter" onclick="toggleTextPlatform('twitter')">
+            <span>𝕏 Twitter</span>
+          </div>
+          <div class="platform-chip active" id="chip-text-facebook" onclick="toggleTextPlatform('facebook')">
+            <span>👤 FB Pribadi</span>
+          </div>
+          <div class="platform-chip active" id="chip-text-facebook_page" onclick="toggleTextPlatform('facebook_page')">
+            <span>📄 FB Page</span>
+          </div>
+          <div class="platform-chip active" id="chip-text-linkedin" onclick="toggleTextPlatform('linkedin')">
+            <span>💼 LinkedIn</span>
+          </div>
+        </div>
+        <div class="mode-notice">
+          <span>💡</span>
+          <span>Instagram, TikTok & YouTube dipisahkan di tab <b>Mode Media Visual</b> karena platform tersebut mewajibkan lampiran media.</span>
+        </div>
+      </div>
+
+      <!-- Mode 2: Media Platforms -->
+      <div id="section-platforms-media" style="display: none;">
+        <div class="platform-section-title">
+          <span>Platform Media Utama:</span>
+          <span class="badge-req">Wajib Foto / Video</span>
+        </div>
+        <div class="platform-selector">
+          <div class="platform-chip active" id="chip-media-instagram" onclick="toggleMediaPlatform('instagram')">
+            <span>📸 Instagram</span>
+          </div>
+          <div class="platform-chip active" id="chip-media-tiktok" onclick="toggleMediaPlatform('tiktok')">
+            <span>🎵 TikTok</span>
+          </div>
+          <div class="platform-chip active" id="chip-media-youtube" onclick="toggleMediaPlatform('youtube')">
+            <span>▶️ YouTube (Video)</span>
+          </div>
+        </div>
+
+        <div class="platform-section-title">
+          <span>Opsi Cross-Post Media ke Platform Lain:</span>
+          <span class="badge-opt">Opsional</span>
+        </div>
+        <div class="platform-selector">
+          <div class="platform-chip" id="chip-cross-threads" onclick="toggleCrossPlatform('threads')">
+            <span>🧵 Threads</span>
+          </div>
+          <div class="platform-chip" id="chip-cross-twitter" onclick="toggleCrossPlatform('twitter')">
+            <span>𝕏 Twitter</span>
+          </div>
+          <div class="platform-chip" id="chip-cross-facebook" onclick="toggleCrossPlatform('facebook')">
+            <span>👤 FB Pribadi</span>
+          </div>
+          <div class="platform-chip" id="chip-cross-facebook_page" onclick="toggleCrossPlatform('facebook_page')">
+            <span>📄 FB Page</span>
+          </div>
+          <div class="platform-chip" id="chip-cross-linkedin" onclick="toggleCrossPlatform('linkedin')">
+            <span>💼 LinkedIn</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Creator Studio Toolbar -->
+      <div class="ai-toolbar">
+        <div class="ai-toolbar-header">
+          <div class="ai-title">
+            <span>✨ AI Creator Studio</span>
+            <span class="ai-badge" id="ai-engine-badge">Bebas Kuota</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span id="ai-active-indicator" style="font-size: 11px; color: #94a3b8;">Text: Default • Image: Flux</span>
+            <button type="button" class="btn-settings-chip" onclick="openAISettingsModal()">
+              ⚙️ Pengaturan AI
+            </button>
+          </div>
+        </div>
+        <div class="ai-btn-grid">
+          <button type="button" class="btn-ai-action" onclick="openAITextModal()">
+            <span>✍️ Tulis Teks AI</span>
+          </button>
+          <button type="button" class="btn-ai-action" onclick="openAIImageModal()">
+            <span>🎨 Buat Gambar AI</span>
+          </button>
+          <button type="button" class="btn-ai-action bundle" onclick="openAIBundleModal()">
+            <span>⚡ Teks + Gambar Paket</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Input Gambar / Video -->
+      <div class="form-group" id="media-input-group">
+        <label class="form-label" id="media-label">
+          <span>🖼️ Media Gambar / Video (Opsional untuk status):</span>
+        </label>
+        <input type="file" id="media-file-input" accept="image/*,video/*" style="display: none;" onchange="handleFileSelect(event)">
+        <div class="media-dropzone" id="media-dropzone" onclick="document.getElementById('media-file-input').click()">
+          <div style="font-size: 24px; margin-bottom: 4px;">📁</div>
+          <div id="dropzone-title" style="font-size: 13px; font-weight: 600; color: #cbd5e1;">Klik untuk pilih file atau seret ke sini</div>
+          <div style="font-size: 11px; color: var(--muted); margin-top: 2px;">Mendukung format JPG, PNG, GIF, MP4, WebM (Maks. 100MB)</div>
+        </div>
+
+        <!-- Preview Box -->
+        <div class="media-preview-box" id="media-preview-box">
+          <div class="media-preview-content">
+            <img id="media-thumb-img" class="media-thumb" style="display: none;" alt="Preview">
+            <video id="media-thumb-vid" class="media-thumb" style="display: none;" muted></video>
+            <div>
+              <div id="media-file-name" style="font-size: 13px; font-weight: 600; color: #fff;">nama-file.png</div>
+              <div id="media-file-size" style="font-size: 11px; color: var(--muted);">1.2 MB</div>
+            </div>
+          </div>
+          <button type="button" class="btn-remove-media" onclick="removeSelectedMedia()">✕ Hapus</button>
+        </div>
+      </div>
+
+      <!-- Text Input / Caption -->
+      <div class="form-group">
+        <label class="form-label" id="text-label">
+          <span>✍️ Teks Postingan / Status:</span>
+        </label>
+        <textarea id="post-text" placeholder="Tuliskan status atau ide postingan Anda di sini..." oninput="updateCharCount()"></textarea>
+      </div>
+
+      <!-- Input Link / URL -->
+      <div class="form-group">
+        <label class="form-label" for="post-link">
+          <span>🔗 Tautan / Link (Opsional):</span>
+        </label>
+        <input type="url" id="post-link" class="input-field" placeholder="https://contoh.com/artikel-anda">
+      </div>
+
+      <div class="composer-footer">
+        <div class="char-count" id="char-count">0 karakter</div>
+        <button class="btn" id="btn-publish" onclick="publishPost()">
+          <span id="btn-publish-text">🚀 Publish Status</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Right Column: Account & Cookie Management -->
+    <div class="card">
+      <div class="card-title">
+        <span>🔑 Manajemen Cookie</span>
+      </div>
+
+      <div id="accounts-list">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+
+    <!-- Bottom: History -->
+    <div class="card history-card">
+      <div class="card-title">
+        <span>📜 Riwayat Postingan Terakhir</span>
+      </div>
+      <div id="history-container">
+        <p style="color: var(--muted); font-size: 14px;">Belum ada riwayat postingan.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Tambah Cookie -->
+  <div class="modal-backdrop" id="cookie-modal">
+    <div class="modal">
+      <div class="modal-title" id="modal-title">Paste Cookie JSON</div>
+      <p style="font-size: 13px; color: var(--muted);">
+        Buka ekstensi <b>Cookie-Editor</b> di browser saat membuka akun Anda, klik <b>Export -> Export as JSON</b>, lalu paste isinya ke bawah:
+      </p>
+      <textarea id="cookie-json-input" placeholder='[{"name": "...", "value": "..."}]'></textarea>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeCookieModal()">Batal</button>
+        <button class="btn" onclick="saveCookie()">Simpan Cookie</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Dokumentasi & Tutorial -->
+  <div class="modal-backdrop" id="doc-modal">
+    <div class="modal modal-lg">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 22px;">📚</span>
+          <div>
+            <div style="font-size: 16px; font-weight: 700;">Panduan & Tutorial SocialHub</div>
+            <div style="font-size: 12px; color: var(--muted);">Dokumentasi penggunaan, pengaturan cookie, dan tips otomasi</div>
+          </div>
+        </div>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="closeDocModal()">✕ Tutup</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Sub-nav Tabs inside modal -->
+        <div class="doc-nav">
+          <button type="button" class="doc-nav-btn active" id="doc-tab-cookie" onclick="switchDocTab('cookie')">🔑 1. Pasang Cookie</button>
+          <button type="button" class="doc-nav-btn" id="doc-tab-mode" onclick="switchDocTab('mode')">📝 2. Mode Teks vs Media</button>
+          <button type="button" class="doc-nav-btn" id="doc-tab-launcher" onclick="switchDocTab('launcher')">⚡ 3. Shortcut & CLI</button>
+          <button type="button" class="doc-nav-btn" id="doc-tab-ai" onclick="switchDocTab('ai')">💻 4. AI Profesi Anak IT</button>
+          <button type="button" class="doc-nav-btn" id="doc-tab-troubleshoot" onclick="switchDocTab('troubleshoot')">💡 5. Tips & Solusi</button>
+        </div>
+
+        <!-- Section 1: Cookie Tutorial -->
+        <div id="doc-sec-cookie">
+          <div class="doc-card">
+            <h4 style="color: #93c5fd; margin-bottom: 8px;">Cara Mudah Mengambil & Memasang Cookie</h4>
+            <p style="color: var(--muted); margin-bottom: 14px;">
+              SocialHub menggunakan sesi browser asli yang diekspor dalam format JSON. Anda tidak perlu mendaftar API developer berbayar atau akun bisnis resmi.
+            </p>
+
+            <div style="margin-bottom: 12px;">
+              <span class="doc-step-badge">1</span>
+              <b>Pasang Ekstensi Cookie-Editor di Browser Anda:</b>
+              <div style="margin-left: 32px; color: var(--muted); font-size: 12.5px; margin-top: 4px;">
+                Download gratis melalui Chrome Web Store atau Firefox Add-ons (cari: <i>Cookie-Editor</i>).
+              </div>
+            </div>
+
+            <div style="margin-bottom: 12px;">
+              <span class="doc-step-badge">2</span>
+              <b>Buka Akun Sosial Media yang Ingin Dihubungkan:</b>
+              <div style="margin-left: 32px; color: var(--muted); font-size: 12.5px; margin-top: 4px;">
+                Buka tab baru, kunjungi situs platform, dan pastikan Anda sudah login ke profil Anda:
+              </div>
+              <table class="doc-table" style="margin-left: 32px; width: calc(100% - 32px);">
+                <thead>
+                  <tr>
+                    <th>Platform</th>
+                    <th>URL Website Login</th>
+                    <th>Nama File Otomatis</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>🧵 Threads</td><td><code>threads.net</code></td><td><code>cookies/threads.json</code></td></tr>
+                  <tr><td>𝕏 Twitter / X</td><td><code>x.com</code></td><td><code>cookies/twitter.json</code></td></tr>
+                  <tr><td>👤 / 📄 Facebook</td><td><code>facebook.com</code> (Profil & Page)</td><td><code>cookies/facebook.json</code></td></tr>
+                  <tr><td>💼 LinkedIn</td><td><code>linkedin.com</code></td><td><code>cookies/linkedin.json</code></td></tr>
+                  <tr><td>📸 Instagram</td><td><code>instagram.com</code></td><td><code>cookies/instagram.json</code></td></tr>
+                  <tr><td>🎵 TikTok</td><td><code>tiktok.com</code></td><td><code>cookies/tiktok.json</code></td></tr>
+                  <tr><td>▶️ YouTube</td><td><code>studio.youtube.com</code></td><td><code>cookies/youtube.json</code></td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div style="margin-bottom: 12px;">
+              <span class="doc-step-badge">3</span>
+              <b>Ekspor sebagai JSON:</b>
+              <div style="margin-left: 32px; color: var(--muted); font-size: 12.5px; margin-top: 4px;">
+                Di tab platform yang sudah login, klik ikon ekstensi <b>Cookie-Editor</b> di pojok kanan atas browser ➔ klik tombol <b>Export</b> ➔ pilih <b>Export as JSON</b> (otomatis tersalin ke clipboard).
+              </div>
+            </div>
+
+            <div>
+              <span class="doc-step-badge">4</span>
+              <b>Tempelkan Langsung di Dashboard ini:</b>
+              <div style="margin-left: 32px; color: var(--muted); font-size: 12.5px; margin-top: 4px;">
+                Pada panel <b>Manajemen Cookie</b> di sisi kanan dashboard, klik tombol <b>+ Pasang / Update</b> pada platform yang sesuai, lalu paste isinya dan klik <b>Simpan Cookie</b>. Selesai!
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 2: Mode Teks vs Media -->
+        <div id="doc-sec-mode" style="display: none;">
+          <div class="doc-card">
+            <h4 style="color: #93c5fd; margin-bottom: 8px;">Pemisahan Mode Posting: Teks vs Media Visual</h4>
+            <p style="color: var(--muted); margin-bottom: 14px;">
+              Setiap platform memiliki aturan arsitektur upload yang berbeda:
+            </p>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+              <div style="background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.25); border-radius: 10px; padding: 14px;">
+                <div style="font-weight: 700; color: #93c5fd; margin-bottom: 6px;">📝 Mode Teks & Status</div>
+                <div style="font-size: 12px; color: var(--muted); margin-bottom: 8px;">Threads, X/Twitter, FB Pribadi & Page, LinkedIn</div>
+                <ul style="font-size: 12.5px; color: #cbd5e1; margin-left: 18px; line-height: 1.5;">
+                  <li>Mendukung posting status <b>teks murni</b> (opini, thread, quote).</li>
+                  <li>Mendukung lampiran <b>link / tautan</b> dengan auto-preview kaya (Open Graph).</li>
+                  <li>Lampiran gambar / video bersifat <b>opsional</b>.</li>
+                </ul>
+              </div>
+
+              <div style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: 10px; padding: 14px;">
+                <div style="font-weight: 700; color: #fbbf24; margin-bottom: 6px;">📸 Mode Media Visual</div>
+                <div style="font-size: 12px; color: var(--muted); margin-bottom: 8px;">Instagram, TikTok, YouTube Studio</div>
+                <ul style="font-size: 12.5px; color: #cbd5e1; margin-left: 18px; line-height: 1.5;">
+                  <li><b>WAJIB menyertakan file foto atau video</b>. Web uploader platform ini tidak mengizinkan posting teks saja di feed.</li>
+                  <li><b>Instagram & TikTok:</b> Mendukung format Foto (JPG, PNG) & Video (MP4, WebM).</li>
+                  <li><b>YouTube Studio:</b> Mendukung format Video (.MP4, .MOV, .WebM).</li>
+                  <li>Dilengkapi opsi <b>Cross-Post</b> untuk sekaligus membagikan media Anda ke Threads, X, Facebook, dan LinkedIn secara serentak!</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 3: Shortcut & CLI -->
+        <div id="doc-sec-launcher" style="display: none;">
+          <div class="doc-card">
+            <h4 style="color: #93c5fd; margin-bottom: 8px;">Shortcut Desktop & Perintah CLI Cepat</h4>
+            <p style="color: var(--muted); margin-bottom: 12px;">
+              Selain dashboard web, Anda juga dapat menjalankan proses publikasi langsung lewat file launcher Windows:
+            </p>
+
+            <div style="margin-bottom: 12px;">
+              <b>🚀 1. Launcher Windows (.bat):</b>
+              <ul style="margin-left: 20px; font-size: 12.5px; color: #cbd5e1; margin-top: 4px; line-height: 1.6;">
+                <li><code>Buka Dashboard.bat</code>: Menjalankan server lokal di latar belakang dan langsung membuka browser ke <code>http://localhost:3456</code>.</li>
+                <li><code>POSTING.bat</code>: Prompt interaktif di terminal untuk posting teks/status cepat ke Threads, Twitter, Facebook, dan LinkedIn.</li>
+                <li><code>POSTING_MEDIA.bat</code>: Prompt interaktif untuk posting foto/video ke Instagram, TikTok, YouTube, dll.</li>
+              </ul>
+            </div>
+
+            <div>
+              <b>💻 2. Perintah CLI (Command-Line):</b>
+              <p style="font-size: 12px; color: var(--muted); margin: 4px 0;">Buka terminal di folder project lalu gunakan sintaks berikut:</p>
+              
+              <div class="code-box"># Posting teks status serentak ke platform teks:
+node src/cli.js --text "Halo semua! Update terbaru hari ini."
+
+# Posting foto / video ke Instagram & TikTok:
+node src/cli.js --text "Pemandangan indah #travel" --media "C:\path\foto.jpg" --platforms instagram,tiktok
+
+# Upload video ke YouTube Studio & cross-post ke LinkedIn:
+node src/cli.js --text "Tutorial Koding Modern" --media "C:\path\video.mp4" --platforms youtube,linkedin
+
+# Menampilkan browser saat proses berlangsung (mode non-headless untuk debug):
+node src/cli.js --text "Testing browser" --visible</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 4: AI Profesi Anak IT -->
+        <div id="doc-sec-ai" style="display: none;">
+          <div class="doc-card">
+            <h4 style="color: #93c5fd; margin-bottom: 8px;">💻 Fitur Khusus: AI Persona & Visual Anak IT</h4>
+            <p style="color: var(--muted); margin-bottom: 14px;">
+              SocialHub dilengkapi preset AI khusus yang memahami bahasa, kultur, meme, dan realita dunia software engineering:
+            </p>
+
+            <div style="margin-bottom: 14px;">
+              <b style="color: #60a5fa;">💻 Persona "Anak IT / Programmer (Relatable & Techy)":</b>
+              <p style="font-size: 12.5px; color: #cbd5e1; margin-top: 4px;">
+                Membuat copywriting yang sangat relate dengan kehidupan developer (suka duka debugging, deploy hari Jumat, clean code, coffee habits, error 500, git commit, framework war) dengan gaya santai dan cerdas.
+              </p>
+            </div>
+
+            <div style="margin-bottom: 14px;">
+              <b style="color: #c084fc;">🖥️ Persona "Tech Lead & Software Engineering":</b>
+              <p style="font-size: 12.5px; color: #cbd5e1; margin-top: 4px;">
+                Sangat cocok untuk postingan profesional di LinkedIn: membahas software architecture, scalability, microservices, system design, dan best practice rekayasa perangkat lunak.
+              </p>
+            </div>
+
+            <div style="margin-bottom: 14px;">
+              <b style="color: #34d399;">🎨 Visual Meja Koding (Developer Workspace Aesthetic):</b>
+              <p style="font-size: 12.5px; color: #cbd5e1; margin-top: 4px;">
+                AI Generator Gambar (Flux) dapat menghasilkan visual setup meja ngoding modern (dual monitor vertikal, mechanical keyboard RGB, IDE dark mode, kopi, ambient lighting) serta visual <i>Isometric 3D Room</i> dan <i>Pixel Art Retro Tech</i>.
+              </p>
+            </div>
+
+            <div>
+              <b style="color: #fbbf24;">⚡ Chip Ide Cepat 1-Klik:</b>
+              <p style="font-size: 12.5px; color: #cbd5e1; margin-top: 4px;">
+                Cukup klik salah satu chip topik di dalam modal (seperti <i>Clean Code, Deploy Jumat, Ngoding & Kopi, Impostor Syndrome</i>) untuk langsung mengisi prompt secara instan tanpa perlu mengetik panjang.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 5: Tips & Solusi Masalah -->
+        <div id="doc-sec-troubleshoot" style="display: none;">
+          <div class="doc-card">
+            <h4 style="color: #93c5fd; margin-bottom: 8px;">Tips Praktis & Solusi Kendala (Troubleshooting)</h4>
+            
+            <div style="margin-bottom: 14px;">
+              <b style="color: #f87171;">❓ Sesi / Cookie Berakhir (Expired):</b>
+              <p style="font-size: 12.5px; color: var(--muted); margin-top: 4px;">
+                Jika status postingan gagal dengan pesan sesi login kedaluwarsa, cukup buka browser biasa, login ulang ke situs akun Anda, ekspor JSON cookie baru dengan Cookie-Editor, lalu klik tombol <b>Update</b> di dashboard.
+              </p>
+            </div>
+
+            <div style="margin-bottom: 14px;">
+              <b style="color: #60a5fa;">📄 Posting ke Facebook Page (Halaman Bisnis):</b>
+              <p style="font-size: 12.5px; color: var(--muted); margin-top: 4px;">
+                Cookie untuk Facebook Page menggunakan file yang sama dengan Facebook Pribadi (<code>facebook.json</code>). Pastikan akun Facebook pribadi Anda berstatus Admin di Halaman Bisnis tersebut agar Playwright dapat melakukan switch profil secara mulus.
+              </p>
+            </div>
+
+            <div style="margin-bottom: 14px;">
+              <b style="color: #34d399;">💼 LinkedIn Auto-Sign-In:</b>
+              <p style="font-size: 12.5px; color: var(--muted); margin-top: 4px;">
+                Saat pertama kali dibuka, LinkedIn sering memunculkan animasi <i>"We're signing you in"</i> selama beberapa detik. Sistem SocialHub telah dilengkapi penanganan otomatis untuk menunggu proses transisi ini hingga mendarat di feed.
+              </p>
+            </div>
+
+            <div>
+              <b style="color: #fbbf24;">📁 Batasan Ukuran File:</b>
+              <p style="font-size: 12.5px; color: var(--muted); margin-top: 4px;">
+                Ukuran file media maksimal yang didukung oleh dashboard adalah <b>100 MB</b>. Untuk video berdurasi panjang di YouTube Studio atau TikTok, disarankan menggunakan format kompresi MP4 H.264 standar.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions" style="padding: 14px 24px; border-top: 1px solid var(--card-border); background: #0f1523;">
+        <button class="btn btn-secondary" onclick="closeDocModal()">Tutup Panduan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal AI Text Generator -->
+  <div class="modal-backdrop" id="ai-text-modal">
+    <div class="modal">
+      <div class="modal-title" style="display: flex; align-items: center; gap: 8px;">
+        <span>✍️</span>
+        <span>Buat Teks Postingan dengan AI</span>
+      </div>
+      <p style="font-size: 13px; color: var(--muted); margin-bottom: 14px;">
+        Masukkan ide atau topik, AI akan membuatkan copywriting status/caption yang engaging dan siap posting.
+      </p>
+
+      <div class="form-group" style="margin-top: 0;">
+        <label class="form-label">Topik atau Ide Postingan:</label>
+        <textarea id="ai-text-topic" style="height: 80px;" placeholder="Misal: 5 tips produktivitas kerja remote untuk developer pemula..."></textarea>
+        <div class="ai-tags-container">
+          <span style="font-size: 11px; color: var(--muted); align-self: center;">💡 Ide Cepat Anak IT:</span>
+          <span class="ai-tag-chip" onclick="setAITextTopic('Tips clean code & refactoring yang bikin hidup developer lebih tenang')">🧼 Clean Code</span>
+          <span class="ai-tag-chip" onclick="setAITextTopic('Suka duka deploy ke production hari Jumat & tragedi bug misterius')">⚠️ Deploy Jumat</span>
+          <span class="ai-tag-chip" onclick="setAITextTopic('Kenapa programmer butuh kopi dan bagaimana kopi mengubah bug jadi fitur')">☕ Ngoding & Kopi</span>
+          <span class="ai-tag-chip" onclick="setAITextTopic('Cara mengatasi burnout dan impostor syndrome di dunia software engineering')">🧠 Impostor Syndrome</span>
+          <span class="ai-tag-chip" onclick="setAITextTopic('Dilema memilih tech stack: tren framework baru vs kestabilan production')">⚖️ Tech Stack</span>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px;">
+        <div>
+          <label class="form-label">Gaya Penulisan / Persona:</label>
+          <select id="ai-text-style" class="ai-select">
+            <option value="Anak IT / Programmer (Relatable & Techy)" selected>💻 Anak IT / Programmer (Relatable & Techy)</option>
+            <option value="Tech Lead & Software Engineering">🖥️ Tech Lead & Software Engineering</option>
+            <option value="Santai & Menarik">Santai & Menarik</option>
+            <option value="Profesional & Bisnis">Profesional & Bisnis</option>
+            <option value="Informatif & Edukatif">Informatif & Edukatif</option>
+            <option value="Inspiratif & Motivasi">Inspiratif & Motivasi</option>
+            <option value="Storytelling">Storytelling (Bercerita)</option>
+            <option value="Lucu & Humor">Lucu & Humor</option>
+            <option value="Promosi & Penjualan">Promosi / Penjualan</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label">Target Platform:</label>
+          <select id="ai-text-platform" class="ai-select">
+            <option value="Umum">Umum (Multi-Platform)</option>
+            <option value="Instagram">Instagram (Visual & Caption)</option>
+            <option value="LinkedIn">LinkedIn (Profesional)</option>
+            <option value="Threads">Threads & X/Twitter</option>
+            <option value="Facebook">Facebook Feed</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 18px; margin-top: 14px;">
+        <label class="ai-checkbox-label">
+          <input type="checkbox" id="ai-text-emoji" checked>
+          <span>Sertakan Emoji (✨)</span>
+        </label>
+        <label class="ai-checkbox-label">
+          <input type="checkbox" id="ai-text-hashtag" checked>
+          <span>Sertakan Hashtag (#)</span>
+        </label>
+      </div>
+
+      <div class="modal-actions" style="margin-top: 20px;">
+        <button class="btn btn-secondary" onclick="closeAITextModal()">Batal</button>
+        <button class="btn" id="btn-submit-ai-text" onclick="generateAITextAction()">
+          <span id="btn-submit-ai-text-label">✨ Generate Teks</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal AI Image Generator -->
+  <div class="modal-backdrop" id="ai-image-modal">
+    <div class="modal">
+      <div class="modal-title" style="display: flex; align-items: center; gap: 8px;">
+        <span>🎨</span>
+        <span>Buat Gambar dengan AI (Flux Engine)</span>
+      </div>
+      <p style="font-size: 13px; color: var(--muted); margin-bottom: 14px;">
+        Ketikkan visual yang ingin digambarkan. Gambar akan digenerate otomatis dan langsung dilampirkan ke composer.
+      </p>
+
+      <div class="form-group" style="margin-top: 0;">
+        <label class="form-label">Deskripsi Gambar (Prompt):</label>
+        <textarea id="ai-image-prompt" style="height: 80px;" placeholder="Misal: Ilustrasi 3D kucing oranye memakai kacamata membaca buku di kafe modern..."></textarea>
+        <div class="ai-tags-container">
+          <span style="font-size: 11px; color: var(--muted); align-self: center;">💡 Ide Visual IT:</span>
+          <span class="ai-tag-chip" onclick="setAIImagePrompt('Aesthetic cozy programmer desk setup at night, dual vertical curved monitors showing code dark mode, glowing mechanical keyboard, coffee mug')">💻 Meja Koding Aesthetic</span>
+          <span class="ai-tag-chip" onclick="setAIImagePrompt('Cute fluffy cat wearing black hoodie typing furiously on laptop in cozy neon room')">🐱 Kucing Programmer</span>
+          <span class="ai-tag-chip" onclick="setAIImagePrompt('Isometric 3D developer office room with floating glowing code blocks, server racks and coffee machine')">🔮 Isometric Dev Room</span>
+          <span class="ai-tag-chip" onclick="setAIImagePrompt('Futuristic AI cybernetic server room with glowing blue holographic network cables')">🌐 Server & Cyber</span>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px;">
+        <div>
+          <label class="form-label">Gaya Visual:</label>
+          <select id="ai-image-style" class="ai-select">
+            <option value="Developer Desk / Workspace Aesthetic" selected>💻 Developer Desk & Workspace Aesthetic</option>
+            <option value="Isometric 3D Tech & Coding">🔮 Isometric 3D Tech & Coding</option>
+            <option value="Pixel Art / Retro Tech">👾 Pixel Art / Retro Tech (8-Bit)</option>
+            <option value="Photorealistic">📸 Photorealistic (Realistis 8K)</option>
+            <option value="3D Render / Digital Art">🔮 3D Render / Digital Art</option>
+            <option value="Anime / Manga">🌸 Anime / Manga Aesthetic</option>
+            <option value="Minimalist Vector">📐 Minimalist Vector (Flat)</option>
+            <option value="Cyberpunk / Futuristic">🌆 Cyberpunk / Futuristic</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label">Ukuran / Aspek Rasio:</label>
+          <select id="ai-image-ratio" class="ai-select">
+            <option value="1:1">⏹️ 1:1 Kotak (Feed IG/FB/LI/Threads)</option>
+            <option value="9:16">📱 9:16 Vertikal (TikTok/Reels/Shorts)</option>
+            <option value="16:9">🖥️ 16:9 Landscape (YouTube/Twitter)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="modal-actions" style="margin-top: 20px;">
+        <button class="btn btn-secondary" onclick="closeAIImageModal()">Batal</button>
+        <button class="btn" id="btn-submit-ai-image" onclick="generateAIImageAction()">
+          <span id="btn-submit-ai-image-label">🎨 Generate Gambar</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal AI Bundle (Teks + Gambar Sekaligus) -->
+  <div class="modal-backdrop" id="ai-bundle-modal">
+    <div class="modal">
+      <div class="modal-title" style="display: flex; align-items: center; gap: 8px;">
+        <span>⚡</span>
+        <span>Buat Paket Lengkap (Teks + Gambar AI)</span>
+      </div>
+      <p style="font-size: 13px; color: var(--muted); margin-bottom: 14px;">
+        Cukup masukkan 1 ide atau topik. AI akan membuatkan copywriting status sekaligus mendesain gambar visual yang serasi dalam 1 klik!
+      </p>
+
+      <div class="form-group" style="margin-top: 0;">
+        <label class="form-label">Topik Utama Konten:</label>
+        <textarea id="ai-bundle-topic" style="height: 75px;" placeholder="Misal: Tips memilih laptop untuk programmer pemula dengan budget terjangkau..."></textarea>
+        <div class="ai-tags-container">
+          <span style="font-size: 11px; color: var(--muted); align-self: center;">💡 Paket Siap Pakai Anak IT:</span>
+          <span class="ai-tag-chip" onclick="setAIBundleTopic('Kenapa programmer selalu menghindari deploy hari Jumat dan mitos horor di baliknya')">⚠️ Tragedi Deploy Jumat</span>
+          <span class="ai-tag-chip" onclick="setAIBundleTopic('5 kebiasaan kecil yang membedakan programmer biasa dengan software engineer handal')">🚀 Mindset Senior Dev</span>
+          <span class="ai-tag-chip" onclick="setAIBundleTopic('Setup workspace meja koding minimalis di kamar yang bikin fokus ngoding seharian')">💻 Setup Meja Ngoding</span>
+          <span class="ai-tag-chip" onclick="setAIBundleTopic('Daftar tools AI dan ekstensi VS Code yang wajib dipakai programmer modern')">🤖 AI Tools Developer</span>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px;">
+        <div>
+          <label class="form-label">Gaya Penulisan / Persona:</label>
+          <select id="ai-bundle-text-style" class="ai-select">
+            <option value="Anak IT / Programmer (Relatable & Techy)" selected>💻 Anak IT / Programmer (Relatable & Techy)</option>
+            <option value="Tech Lead & Software Engineering">🖥️ Tech Lead & Software Engineering</option>
+            <option value="Santai & Menarik">Santai & Menarik</option>
+            <option value="Profesional & Bisnis">Profesional & Bisnis</option>
+            <option value="Informatif & Edukatif">Informatif & Edukatif</option>
+            <option value="Inspiratif & Motivasi">Inspiratif & Motivasi</option>
+            <option value="Promosi & Penjualan">Promosi / Penjualan</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label">Gaya Gambar Visual:</label>
+          <select id="ai-bundle-image-style" class="ai-select">
+            <option value="Developer Desk / Workspace Aesthetic" selected>💻 Developer Desk & Workspace Aesthetic</option>
+            <option value="Isometric 3D Tech & Coding">🔮 Isometric 3D Tech & Coding</option>
+            <option value="Pixel Art / Retro Tech">👾 Pixel Art / Retro Tech</option>
+            <option value="3D Render / Digital Art">🔮 3D Render / Digital Art</option>
+            <option value="Photorealistic">📸 Photorealistic (Realistis)</option>
+            <option value="Anime / Manga">🌸 Anime / Manga</option>
+            <option value="Minimalist Vector">📐 Minimalist Vector</option>
+            <option value="Cyberpunk / Futuristic">🌆 Cyberpunk / Futuristic</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="margin-top: 12px;">
+        <label class="form-label">Aspek Rasio Gambar:</label>
+        <select id="ai-bundle-ratio" class="ai-select">
+          <option value="1:1">⏹️ 1:1 Kotak (Feed IG/FB/LI/Threads)</option>
+          <option value="9:16">📱 9:16 Vertikal (TikTok/Reels/Shorts)</option>
+          <option value="16:9">🖥️ 16:9 Landscape (YouTube/Twitter)</option>
+        </select>
+      </div>
+
+      <div class="modal-actions" style="margin-top: 20px;">
+        <button class="btn btn-secondary" onclick="closeAIBundleModal()">Batal</button>
+        <button class="btn" id="btn-submit-ai-bundle" onclick="generateAIBundleAction()">
+          <span id="btn-submit-ai-bundle-label">⚡ Generate Paket AI</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Pengaturan AI (Default & Custom API) -->
+  <div class="modal-backdrop" id="ai-settings-modal">
+    <div class="modal modal-lg">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 22px;">⚙️</span>
+          <div>
+            <div style="font-size: 16px; font-weight: 700;">Pengaturan AI Engine (Default & Custom API)</div>
+            <div style="font-size: 12px; color: var(--muted);">Atur provider AI untuk teks (copywriting) dan visual (gambar)</div>
+          </div>
+        </div>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="closeAISettingsModal()">✕ Tutup</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Section 1: Provider Teks -->
+        <div class="doc-card" style="margin-bottom: 20px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <h4 style="color: #93c5fd; font-size: 14.5px; display: flex; align-items: center; gap: 8px;">
+              <span>✍️</span> Provider Teks / Status Copywriter
+            </h4>
+            <span id="badge-active-text-provider" class="status-badge connected">Default Aktif</span>
+          </div>
+          <p style="font-size: 12.5px; color: var(--muted); margin-bottom: 12px;">
+            Pilih engine yang digunakan untuk membuat status, caption, dan copywriting media sosial:
+          </p>
+
+          <div class="ai-options-grid">
+            <div class="ai-provider-card active" id="card-text-default" onclick="selectTextProvider('default')">
+              <div class="provider-title">
+                <span>🟢 Default (Pollinations AI)</span>
+              </div>
+              <div class="provider-desc">
+                Bebas kuota, tanpa API key, siap pakai langsung menggunakan model OpenAI/GPT.
+              </div>
+            </div>
+
+            <div class="ai-provider-card" id="card-text-custom" onclick="selectTextProvider('custom')">
+              <div class="provider-title">
+                <span>🔵 Custom API (OpenAI Compatible)</span>
+              </div>
+              <div class="provider-desc">
+                Gunakan API key Anda sendiri: OpenAI, Groq, OpenRouter, DeepSeek, atau Ollama lokal.
+              </div>
+            </div>
+          </div>
+
+          <!-- Custom Text Settings Panel -->
+          <div class="custom-api-box" id="panel-custom-text" style="display: none;">
+            <div style="font-size: 12px; font-weight: 700; color: #cbd5e1; margin-bottom: 4px;">⚡ Preset Cepat (Klik untuk mengisi otomatis):</div>
+            <div class="preset-chips-row">
+              <span class="preset-chip" onclick="applyAIPreset('openai')">🤖 OpenAI (gpt-4o-mini)</span>
+              <span class="preset-chip" onclick="applyAIPreset('groq')">⚡ Groq (Llama 3.3 70B - Cepat)</span>
+              <span class="preset-chip" onclick="applyAIPreset('openrouter')">🌐 OpenRouter</span>
+              <span class="preset-chip" onclick="applyAIPreset('deepseek')">🐳 DeepSeek (deepseek-chat)</span>
+              <span class="preset-chip" onclick="applyAIPreset('ollama')">💻 Ollama (Local LLM)</span>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <div>
+                <label class="form-label" style="font-size: 12px;">Base URL Endpoint:</label>
+                <input type="text" id="ai-custom-text-url" class="input-field" placeholder="https://api.openai.com/v1">
+                <span style="font-size: 10.5px; color: var(--muted);">Format OpenAI compatible (akhiran /v1)</span>
+              </div>
+              <div>
+                <label class="form-label" style="font-size: 12px;">Model Name:</label>
+                <input type="text" id="ai-custom-text-model" class="input-field" placeholder="gpt-4o-mini">
+                <span style="font-size: 10.5px; color: var(--muted);">Contoh: gpt-4o-mini, deepseek-chat, llama-3.3-70b-versatile</span>
+              </div>
+            </div>
+
+            <div style="margin-top: 10px;">
+              <label class="form-label" style="font-size: 12px;">API Key (Bearer Token):</label>
+              <div class="input-with-action">
+                <input type="password" id="ai-custom-text-key" class="input-field" placeholder="sk-...">
+                <button type="button" class="btn-toggle-eye" id="btn-toggle-text-key" onclick="toggleKeyVisibility('ai-custom-text-key', 'btn-toggle-text-key')">👁️</button>
+              </div>
+              <span style="font-size: 10.5px; color: var(--muted);">Untuk Ollama lokal, API Key boleh dikosongkan.</span>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; margin-top: 12px;">
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-test-text-ai" onclick="testAIConnectionAction('text')">
+                <span id="btn-test-text-ai-label">🧪 Uji Koneksi Teks</span>
+              </button>
+            </div>
+            <div id="test-feedback-text" class="test-feedback"></div>
+          </div>
+        </div>
+
+        <!-- Section 2: Provider Gambar -->
+        <div class="doc-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <h4 style="color: #93c5fd; font-size: 14.5px; display: flex; align-items: center; gap: 8px;">
+              <span>🎨</span> Provider Gambar Visual (AI Image)
+            </h4>
+            <span id="badge-active-image-provider" class="status-badge connected">Default Aktif</span>
+          </div>
+          <p style="font-size: 12.5px; color: var(--muted); margin-bottom: 12px;">
+            Pilih engine yang digunakan untuk membuat ilustrasi, render 3D, dan foto visual postingan:
+          </p>
+
+          <div class="ai-options-grid">
+            <div class="ai-provider-card active" id="card-image-default" onclick="selectImageProvider('default')">
+              <div class="provider-title">
+                <span>🟢 Default (Pollinations Flux)</span>
+              </div>
+              <div class="provider-desc">
+                Gratis, resolusi tinggi, hasil photorealistic & 3D render tanpa watermark.
+              </div>
+            </div>
+
+            <div class="ai-provider-card" id="card-image-custom" onclick="selectImageProvider('custom')">
+              <div class="provider-title">
+                <span>🔵 Custom API (OpenAI DALL-E)</span>
+              </div>
+              <div class="provider-desc">
+                Gunakan model DALL-E 3 atau endpoint generator gambar kompatibel OpenAI pilihan Anda.
+              </div>
+            </div>
+          </div>
+
+          <!-- Custom Image Settings Panel -->
+          <div class="custom-api-box" id="panel-custom-image" style="display: none;">
+            <div style="margin-bottom: 12px;">
+              <label class="ai-checkbox-label">
+                <input type="checkbox" id="ai-sync-image-creds" onchange="syncImageCredentials()">
+                <span>Gunakan Base URL & API Key yang sama dengan Teks</span>
+              </label>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <div>
+                <label class="form-label" style="font-size: 12px;">Base URL Endpoint:</label>
+                <input type="text" id="ai-custom-image-url" class="input-field" placeholder="https://api.openai.com/v1">
+              </div>
+              <div>
+                <label class="form-label" style="font-size: 12px;">Model Gambar:</label>
+                <input type="text" id="ai-custom-image-model" class="input-field" placeholder="dall-e-3">
+              </div>
+            </div>
+
+            <div style="margin-top: 10px;">
+              <label class="form-label" style="font-size: 12px;">API Key Gambar:</label>
+              <div class="input-with-action">
+                <input type="password" id="ai-custom-image-key" class="input-field" placeholder="sk-...">
+                <button type="button" class="btn-toggle-eye" id="btn-toggle-image-key" onclick="toggleKeyVisibility('ai-custom-image-key', 'btn-toggle-image-key')">👁️</button>
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; margin-top: 12px;">
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-test-image-ai" onclick="testAIConnectionAction('image')">
+                <span id="btn-test-image-ai-label">🧪 Uji Koneksi Gambar</span>
+              </button>
+            </div>
+            <div id="test-feedback-image" class="test-feedback"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions" style="padding: 16px 24px; border-top: 1px solid var(--card-border); background: #0f1523; justify-content: space-between;">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="resetAIDefaultsAction()" style="color: #cbd5e1;">
+          ↺ Kembalikan ke Default
+        </button>
+        <div style="display: flex; gap: 10px;">
+          <button type="button" class="btn btn-secondary" onclick="closeAISettingsModal()">Batal</button>
+          <button type="button" class="btn" id="btn-save-ai-settings" onclick="saveAISettingsAction()">
+            <span id="btn-save-ai-settings-label">💾 Simpan Pengaturan</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentMode = 'text'; // 'text' | 'media'
+    let selectedTextPlatforms = ['threads', 'twitter', 'facebook', 'facebook_page', 'linkedin'];
+    let selectedMediaPlatforms = ['instagram', 'tiktok', 'youtube'];
+    let selectedCrossPlatforms = [];
+    let platformsState = {};
+    let activeModalPlatform = null;
+
+    function setComposerMode(mode) {
+      currentMode = mode;
+      const btnText = document.getElementById('tab-btn-text');
+      const btnMedia = document.getElementById('tab-btn-media');
+      const secText = document.getElementById('section-platforms-text');
+      const secMedia = document.getElementById('section-platforms-media');
+      const mediaLabel = document.getElementById('media-label');
+      const textLabel = document.getElementById('text-label');
+      const dropzoneTitle = document.getElementById('dropzone-title');
+      const dropzone = document.getElementById('media-dropzone');
+      const textarea = document.getElementById('post-text');
+      const publishBtnText = document.getElementById('btn-publish-text');
+
+      if (mode === 'text') {
+        btnText.classList.add('active');
+        btnMedia.classList.remove('active');
+        secText.style.display = 'block';
+        secMedia.style.display = 'none';
+        mediaLabel.innerHTML = '<span>🖼️ Media Gambar / Video (Opsional untuk status):</span>';
+        textLabel.innerHTML = '<span>✍️ Teks Postingan / Status:</span>';
+        dropzoneTitle.innerText = 'Klik untuk pilih file atau seret ke sini';
+        dropzone.style.borderColor = 'var(--card-border)';
+        textarea.placeholder = 'Tuliskan status, thread, opini, atau ide postingan Anda di sini...';
+        publishBtnText.innerText = '🚀 Publish Status (Threads, X, FB, LinkedIn)';
+      } else {
+        btnMedia.classList.add('active');
+        btnText.classList.remove('active');
+        secText.style.display = 'none';
+        secMedia.style.display = 'block';
+        mediaLabel.innerHTML = '<span>🖼️ Media Foto / Video <span class="badge-req" style="margin-left: 6px;">WAJIB</span>:</span>';
+        textLabel.innerHTML = '<span>📝 Caption / Deskripsi Media:</span>';
+        dropzoneTitle.innerText = 'PILIH FILE FOTO ATAU VIDEO (WAJIB)';
+        dropzone.style.borderColor = '#3b82f6';
+        textarea.placeholder = 'Tuliskan caption, cerita, dan hashtag (#)...';
+        publishBtnText.innerText = '🚀 Publish Media (Instagram, TikTok, YouTube)';
+      }
+    }
+
+    function toggleTextPlatform(platform) {
+      const chip = document.getElementById(`chip-text-${platform}`);
+      if (selectedTextPlatforms.includes(platform)) {
+        selectedTextPlatforms = selectedTextPlatforms.filter(p => p !== platform);
+        chip.classList.remove('active');
+      } else {
+        selectedTextPlatforms.push(platform);
+        chip.classList.add('active');
+      }
+    }
+
+    function toggleMediaPlatform(platform) {
+      const chip = document.getElementById(`chip-media-${platform}`);
+      if (selectedMediaPlatforms.includes(platform)) {
+        selectedMediaPlatforms = selectedMediaPlatforms.filter(p => p !== platform);
+        chip.classList.remove('active');
+      } else {
+        selectedMediaPlatforms.push(platform);
+        chip.classList.add('active');
+      }
+    }
+
+    function toggleCrossPlatform(platform) {
+      const chip = document.getElementById(`chip-cross-${platform}`);
+      if (selectedCrossPlatforms.includes(platform)) {
+        selectedCrossPlatforms = selectedCrossPlatforms.filter(p => p !== platform);
+        chip.classList.remove('active');
+      } else {
+        selectedCrossPlatforms.push(platform);
+        chip.classList.add('active');
+      }
+    }
+
+    async function loadStatus() {
+      try {
+        const res = await fetch('/api/status');
+        const data = await res.json();
+        platformsState = data.platforms;
+        renderAccounts();
+        renderHistory(data.history || []);
+      } catch (err) {
+        console.error('Gagal memuat status:', err);
+      }
+    }
+
+    function renderAccounts() {
+      const container = document.getElementById('accounts-list');
+      const textAccounts = [
+        { key: 'threads', label: 'Threads', icon: '🧵', class: 'icon-threads', cookieKey: 'threads' },
+        { key: 'twitter', label: 'X (Twitter)', icon: '𝕏', class: 'icon-twitter', cookieKey: 'twitter' },
+        { key: 'facebook', label: 'Facebook (Profil Pribadi)', icon: '👤', class: 'icon-facebook', cookieKey: 'facebook' },
+        { key: 'facebook_page', label: 'Facebook Page (Webme Studio)', icon: '📄', class: 'icon-facebook', cookieKey: 'facebook' },
+        { key: 'linkedin', label: 'LinkedIn', icon: '💼', class: 'icon-linkedin', cookieKey: 'linkedin' }
+      ];
+
+      const mediaAccounts = [
+        { key: 'instagram', label: 'Instagram', icon: '📸', class: 'icon-instagram', cookieKey: 'instagram' },
+        { key: 'tiktok', label: 'TikTok', icon: '🎵', class: 'icon-tiktok', cookieKey: 'tiktok' },
+        { key: 'youtube', label: 'YouTube Studio', icon: '▶️', class: 'icon-youtube', cookieKey: 'youtube' }
+      ];
+
+      const renderItems = (items) => items.map(item => {
+        const p = platformsState[item.key] || { connected: false, cookieCount: 0 };
+        return `
+          <div class="account-item">
+            <div class="account-info">
+              <div class="platform-icon ${item.class}">${item.icon}</div>
+              <div>
+                <div class="account-name">${item.label}</div>
+                <span class="status-badge ${p.connected ? 'connected' : 'disconnected'}">
+                  ${p.connected ? '● Terhubung (' + p.cookieCount + ' cookies)' : '○ Belum Ada Cookie'}
+                </span>
+              </div>
+            </div>
+            <div>
+              <button class="btn btn-secondary btn-sm" onclick="openCookieModal('${item.cookieKey}')">
+                ${p.connected ? 'Update' : '+ Pasang'}
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      container.innerHTML = `
+        <div class="platform-section-title" style="margin-top: 0;">
+          <span>Platform Teks / Mikroblog</span>
+        </div>
+        ${renderItems(textAccounts)}
+
+        <div class="platform-section-title" style="margin-top: 24px;">
+          <span>Platform Media Visual (Wajib Media)</span>
+        </div>
+        ${renderItems(mediaAccounts)}
+      `;
+    }
+
+    function renderHistory(history) {
+      const container = document.getElementById('history-container');
+      if (history.length === 0) {
+        container.innerHTML = '<p style="color: var(--muted); font-size: 14px;">Belum ada riwayat postingan.</p>';
+        return;
+      }
+
+      container.innerHTML = history.slice(0, 10).map(item => {
+        const date = new Date(item.timestamp).toLocaleString('id-ID');
+        const results = item.results.map(r => `
+          <span class="result-pill ${r.success ? 'ok' : 'err'}">${r.platform}: ${r.success ? 'Sukses' : 'Gagal'}</span>
+        `).join('');
+
+        const mediaTag = item.hasMedia ? `<span style="font-size: 11px; background: rgba(59, 130, 246, 0.2); color: #93c5fd; padding: 2px 6px; border-radius: 4px; margin-right: 6px;">📎 ${escapeHtml(item.mediaName || 'Media')}</span>` : '';
+        const linkTag = item.link ? `<div style="font-size: 12px; color: var(--accent); margin-top: 4px;">🔗 <a href="${escapeHtml(item.link)}" target="_blank" style="color: var(--accent); text-decoration: none;">${escapeHtml(item.link)}</a></div>` : '';
+
+        return `
+          <div class="history-item">
+            <div class="history-text">
+              ${mediaTag}
+              ${escapeHtml(item.text)}
+              ${linkTag}
+            </div>
+            <div class="history-meta">
+              <div>${date}</div>
+              <div style="margin-top: 6px;">${results}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Toast Notification System (Pengganti popup alert browser)
+    function showToast(message, type = 'success') {
+      let container = document.getElementById('toast-container');
+      if (!container) {
+        container = document.createElement('div');
+        container.id = 'toast-container';
+        container.className = 'toast-container';
+        document.body.appendChild(container);
+      }
+
+      const toast = document.createElement('div');
+      toast.className = `toast-item ${type}`;
+      
+      const icon = type === 'success' ? '✅' : (type === 'error' ? '❌' : 'ℹ️');
+      toast.innerHTML = `
+        <span style="font-size: 16px;">${icon}</span>
+        <span style="flex: 1; line-height: 1.4;">${escapeHtml(message)}</span>
+      `;
+
+      container.appendChild(toast);
+
+      setTimeout(() => toast.classList.add('show'), 15);
+
+      setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 400);
+      }, 3500);
+    }
+
+    // Media Upload & Drag Drop handlers
+    let selectedMediaFile = null;
+    let aiGeneratedMedia = null;
+
+    function handleFileSelect(event) {
+      const file = event.target.files[0];
+      if (file) setMediaFile(file);
+    }
+
+    function setMediaFile(file) {
+      if (file.size > 100 * 1024 * 1024) {
+        return showToast('Ukuran file maksimal 100 MB!', 'error');
+      }
+
+      selectedMediaFile = file;
+      aiGeneratedMedia = null;
+      const previewBox = document.getElementById('media-preview-box');
+      const dropzone = document.getElementById('media-dropzone');
+      const img = document.getElementById('media-thumb-img');
+      const vid = document.getElementById('media-thumb-vid');
+      const nameEl = document.getElementById('media-file-name');
+      const sizeEl = document.getElementById('media-file-size');
+
+      nameEl.innerText = file.name;
+      sizeEl.innerText = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+
+      const url = URL.createObjectURL(file);
+      if (file.type.startsWith('video/')) {
+        img.style.display = 'none';
+        vid.src = url;
+        vid.style.display = 'block';
+      } else {
+        vid.style.display = 'none';
+        img.src = url;
+        img.style.display = 'block';
+      }
+
+      dropzone.style.display = 'none';
+      previewBox.style.display = 'flex';
+    }
+
+    function setAIMedia(mediaData) {
+      aiGeneratedMedia = mediaData;
+      selectedMediaFile = null;
+      document.getElementById('media-file-input').value = '';
+
+      const previewBox = document.getElementById('media-preview-box');
+      const dropzone = document.getElementById('media-dropzone');
+      const img = document.getElementById('media-thumb-img');
+      const vid = document.getElementById('media-thumb-vid');
+      const nameEl = document.getElementById('media-file-name');
+      const sizeEl = document.getElementById('media-file-size');
+
+      nameEl.innerText = '✨ ' + mediaData.fileName;
+      sizeEl.innerText = mediaData.fileSize ? (mediaData.fileSize / (1024 * 1024)).toFixed(2) + ' MB (AI Generated)' : 'AI Image';
+
+      vid.style.display = 'none';
+      img.src = mediaData.urlPath + '?t=' + Date.now();
+      img.style.display = 'block';
+
+      dropzone.style.display = 'none';
+      previewBox.style.display = 'flex';
+    }
+
+    function removeSelectedMedia() {
+      selectedMediaFile = null;
+      aiGeneratedMedia = null;
+      document.getElementById('media-file-input').value = '';
+      document.getElementById('media-preview-box').style.display = 'none';
+      document.getElementById('media-dropzone').style.display = 'block';
+      document.getElementById('media-thumb-img').src = '';
+      document.getElementById('media-thumb-vid').src = '';
+    }
+
+    // Setup drag & drop
+    const dropzone = document.getElementById('media-dropzone');
+    dropzone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropzone.classList.add('dragover');
+    });
+    dropzone.addEventListener('dragleave', () => {
+      dropzone.classList.remove('dragover');
+    });
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('dragover');
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+        setMediaFile(e.dataTransfer.files[0]);
+      }
+    });
+
+    function togglePlatform(platform) {
+      const chip = document.getElementById(`chip-${platform}`);
+      if (selectedPlatforms.includes(platform)) {
+        selectedPlatforms = selectedPlatforms.filter(p => p !== platform);
+        chip.classList.remove('active');
+      } else {
+        selectedPlatforms.push(platform);
+        chip.classList.add('active');
+      }
+    }
+
+    function updateCharCount() {
+      const text = document.getElementById('post-text').value;
+      document.getElementById('char-count').innerText = `${text.length} karakter`;
+    }
+
+    function openDocModal() {
+      document.getElementById('doc-modal').classList.add('show');
+    }
+
+    function closeDocModal() {
+      document.getElementById('doc-modal').classList.remove('show');
+    }
+
+    function switchDocTab(tabName) {
+      const tabs = ['cookie', 'mode', 'launcher', 'ai', 'troubleshoot'];
+      tabs.forEach(t => {
+        const btn = document.getElementById(`doc-tab-${t}`);
+        const sec = document.getElementById(`doc-sec-${t}`);
+        if (t === tabName) {
+          btn.classList.add('active');
+          sec.style.display = 'block';
+        } else {
+          btn.classList.remove('active');
+          sec.style.display = 'none';
+        }
+      });
+    }
+
+    // AI Generator Modal Controls & Preset Helpers
+    function setAITextTopic(val) {
+      document.getElementById('ai-text-topic').value = val;
+    }
+
+    function setAIImagePrompt(val) {
+      document.getElementById('ai-image-prompt').value = val;
+    }
+
+    function setAIBundleTopic(val) {
+      document.getElementById('ai-bundle-topic').value = val;
+    }
+
+    function openAITextModal() {
+      document.getElementById('ai-text-modal').classList.add('show');
+      document.getElementById('ai-text-topic').focus();
+    }
+
+    function closeAITextModal() {
+      document.getElementById('ai-text-modal').classList.remove('show');
+    }
+
+    function openAIImageModal() {
+      document.getElementById('ai-image-modal').classList.add('show');
+      document.getElementById('ai-image-prompt').focus();
+    }
+
+    function closeAIImageModal() {
+      document.getElementById('ai-image-modal').classList.remove('show');
+    }
+
+    function openAIBundleModal() {
+      document.getElementById('ai-bundle-modal').classList.add('show');
+      document.getElementById('ai-bundle-topic').focus();
+    }
+
+    function closeAIBundleModal() {
+      document.getElementById('ai-bundle-modal').classList.remove('show');
+    }
+
+    // AI Generation Actions
+    async function generateAITextAction() {
+      const topic = document.getElementById('ai-text-topic').value.trim();
+      const style = document.getElementById('ai-text-style').value;
+      const platform = document.getElementById('ai-text-platform').value;
+      const includeEmoji = document.getElementById('ai-text-emoji').checked;
+      const includeHashtags = document.getElementById('ai-text-hashtag').checked;
+
+      if (!topic) return showToast('Silakan masukkan topik atau ide postingan!', 'info');
+
+      const btn = document.getElementById('btn-submit-ai-text');
+      const label = document.getElementById('btn-submit-ai-text-label');
+      btn.disabled = true;
+      label.innerText = '⏳ Sedang Menulis...';
+
+      try {
+        const res = await fetch('/api/ai/text', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ topic, style, platform, includeEmoji, includeHashtags })
+        });
+        const data = await res.json();
+        if (data.success && data.text) {
+          document.getElementById('post-text').value = data.text;
+          updateCharCount();
+          closeAITextModal();
+          showToast('✨ Teks postingan AI berhasil dibuat dan dimasukkan!', 'success');
+        } else {
+          showToast('Gagal: ' + (data.error || 'Terjadi kesalahan'), 'error');
+        }
+      } catch (err) {
+        showToast('Gagal membuat teks AI: ' + err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        label.innerText = '✨ Generate Teks';
+      }
+    }
+
+    async function generateAIImageAction() {
+      const prompt = document.getElementById('ai-image-prompt').value.trim();
+      const style = document.getElementById('ai-image-style').value;
+      const aspectRatio = document.getElementById('ai-image-ratio').value;
+
+      if (!prompt) return showToast('Silakan masukkan deskripsi gambar (prompt)!', 'info');
+
+      const btn = document.getElementById('btn-submit-ai-image');
+      const label = document.getElementById('btn-submit-ai-image-label');
+      btn.disabled = true;
+      label.innerText = '⏳ Sedang Menggambar AI...';
+
+      try {
+        const res = await fetch('/api/ai/image', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt, style, aspectRatio })
+        });
+        const data = await res.json();
+        if (data.success && data.filePath) {
+          setAIMedia({
+            path: data.filePath,
+            fileName: data.fileName,
+            urlPath: data.urlPath,
+            fileSize: data.fileSize
+          });
+          closeAIImageModal();
+          showToast('🎨 Gambar AI berhasil dibuat dan dilampirkan!', 'success');
+        } else {
+          showToast('Gagal: ' + (data.error || 'Terjadi kesalahan'), 'error');
+        }
+      } catch (err) {
+        showToast('Gagal membuat gambar AI: ' + err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        label.innerText = '🎨 Generate Gambar';
+      }
+    }
+
+    async function generateAIBundleAction() {
+      const topic = document.getElementById('ai-bundle-topic').value.trim();
+      const textStyle = document.getElementById('ai-bundle-text-style').value;
+      const imageStyle = document.getElementById('ai-bundle-image-style').value;
+      const aspectRatio = document.getElementById('ai-bundle-ratio').value;
+
+      if (!topic) return showToast('Silakan masukkan topik utama konten!', 'info');
+
+      const btn = document.getElementById('btn-submit-ai-bundle');
+      const label = document.getElementById('btn-submit-ai-bundle-label');
+      btn.disabled = true;
+      label.innerText = '⏳ Menulis Teks & Menggambar AI...';
+
+      try {
+        const res = await fetch('/api/ai/bundle', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ topic, textStyle, imageStyle, aspectRatio })
+        });
+        const data = await res.json();
+        if (data.success) {
+          if (data.text) {
+            document.getElementById('post-text').value = data.text;
+            updateCharCount();
+          }
+          if (data.filePath) {
+            setAIMedia({
+              path: data.filePath,
+              fileName: data.fileName,
+              urlPath: data.urlPath,
+              fileSize: data.fileSize
+            });
+          }
+          closeAIBundleModal();
+          showToast('⚡ Paket AI Lengkap (Teks + Gambar) berhasil dipasang!', 'success');
+        } else {
+          showToast('Gagal: ' + (data.error || 'Terjadi kesalahan'), 'error');
+        }
+      } catch (err) {
+        showToast('Gagal membuat paket AI: ' + err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        label.innerText = '⚡ Generate Paket AI';
+      }
+    }
+
+    function openCookieModal(platform) {
+      activeModalPlatform = platform;
+      document.getElementById('modal-title').innerText = `Paste Cookie untuk ${platform.toUpperCase()}`;
+      document.getElementById('cookie-json-input').value = '';
+      document.getElementById('cookie-modal').classList.add('show');
+    }
+
+    function closeCookieModal() {
+      document.getElementById('cookie-modal').classList.remove('show');
+      activeModalPlatform = null;
+    }
+
+    async function saveCookie() {
+      const raw = document.getElementById('cookie-json-input').value.trim();
+      if (!raw) return showToast('Silakan paste JSON cookie terlebih dahulu!', 'info');
+
+      try {
+        const res = await fetch(`/api/cookie/${activeModalPlatform}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ cookies: raw })
+        });
+        const data = await res.json();
+        if (data.success) {
+          closeCookieModal();
+          loadStatus();
+          showToast(`Cookie ${activeModalPlatform.toUpperCase()} berhasil disimpan!`, 'success');
+        } else {
+          showToast('Error: ' + data.error, 'error');
+        }
+      } catch (err) {
+        showToast('Gagal menghubungi server: ' + err.message, 'error');
+      }
+    }
+
+    async function publishPost() {
+      const text = document.getElementById('post-text').value.trim();
+      const link = document.getElementById('post-link').value.trim();
+
+      let targetPlatforms = [];
+      const hasMedia = !!selectedMediaFile || !!aiGeneratedMedia;
+
+      if (currentMode === 'text') {
+        targetPlatforms = [...selectedTextPlatforms];
+        if (targetPlatforms.length === 0) {
+          return showToast('Pilih minimal 1 platform teks!', 'info');
+        }
+        if (!text && !hasMedia && !link) {
+          return showToast('Tuliskan teks status terlebih dahulu!', 'info');
+        }
+      } else {
+        // Mode Media Visual (Instagram, TikTok, YouTube)
+        if (!hasMedia) {
+          return showToast('Instagram, TikTok & YouTube mewajibkan file gambar atau video!', 'info');
+        }
+        targetPlatforms = [...selectedMediaPlatforms, ...selectedCrossPlatforms];
+        if (targetPlatforms.length === 0) {
+          return showToast('Pilih minimal 1 platform tujuan!', 'info');
+        }
+      }
+
+      const btn = document.getElementById('btn-publish');
+      const btnText = document.getElementById('btn-publish-text');
+      btn.disabled = true;
+      btnText.innerText = '⏳ Sedang Memposting...';
+
+      const formData = new FormData();
+      formData.append('text', text);
+      formData.append('link', link);
+      formData.append('platforms', JSON.stringify(targetPlatforms));
+      if (selectedMediaFile) {
+        formData.append('media', selectedMediaFile);
+      } else if (aiGeneratedMedia && aiGeneratedMedia.path) {
+        formData.append('mediaPath', aiGeneratedMedia.path);
+      }
+
+      try {
+        const res = await fetch('/api/publish', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+        if (data.success) {
+          document.getElementById('post-text').value = '';
+          document.getElementById('post-link').value = '';
+          removeSelectedMedia();
+          updateCharCount();
+          loadStatus();
+          showToast('🚀 Postingan berhasil dikirim ke media sosial!', 'success');
+        } else {
+          showToast('Gagal: ' + (data.error || 'Terjadi kesalahan'), 'error');
+        }
+      } catch (err) {
+        showToast('Gagal memposting: ' + err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btnText.innerText = currentMode === 'text' ? '🚀 Publish Status (Threads, X, FB, LinkedIn)' : '🚀 Publish Media (Instagram, TikTok, YouTube)';
+      }
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.innerText = text;
+      return div.innerHTML;
+    }
+
+    // ==========================================
+    // AI SETTINGS MANAGEMENT LOGIC
+    // ==========================================
+    let aiConfigState = {
+      textProvider: 'default',
+      imageProvider: 'default',
+      customText: {
+        baseUrl: 'https://api.openai.com/v1',
+        apiKey: '',
+        model: 'gpt-4o-mini'
+      },
+      customImage: {
+        baseUrl: 'https://api.openai.com/v1',
+        apiKey: '',
+        model: 'dall-e-3'
+      }
+    };
+
+    async function loadAIConfig() {
+      try {
+        const res = await fetch('/api/ai/config');
+        const data = await res.json();
+        if (data.success && data.config) {
+          aiConfigState = data.config;
+          updateAIBadges();
+        }
+      } catch (err) {
+        console.error('Gagal memuat AI config:', err);
+      }
+    }
+
+    function updateAIBadges() {
+      const badge = document.getElementById('ai-engine-badge');
+      const indicator = document.getElementById('ai-active-indicator');
+      const badgeText = document.getElementById('badge-active-text-provider');
+      const badgeImg = document.getElementById('badge-active-image-provider');
+
+      const isCustomText = aiConfigState.textProvider === 'custom';
+      const isCustomImage = aiConfigState.imageProvider === 'custom';
+
+      if (badge) {
+        if (isCustomText || isCustomImage) {
+          badge.innerText = 'Custom API';
+          badge.style.background = 'linear-gradient(135deg, #8b5cf6, #ec4899)';
+        } else {
+          badge.innerText = 'Bebas Kuota';
+          badge.style.background = 'linear-gradient(135deg, #3b82f6, #a855f7)';
+        }
+      }
+
+      if (indicator) {
+        const textLabel = isCustomText ? `Text: Custom (${aiConfigState.customText?.model || 'OpenAI'})` : 'Text: Default (Pollinations)';
+        const imgLabel = isCustomImage ? `Img: Custom (${aiConfigState.customImage?.model || 'DALL-E'})` : 'Img: Default (Flux)';
+        indicator.innerText = `${textLabel} • ${imgLabel}`;
+      }
+
+      if (badgeText) {
+        badgeText.className = `status-badge ${isCustomText ? 'connected' : 'connected'}`;
+        badgeText.innerText = isCustomText ? `Custom: ${aiConfigState.customText?.model || 'Active'}` : 'Default Aktif (Bebas Kuota)';
+      }
+
+      if (badgeImg) {
+        badgeImg.className = `status-badge ${isCustomImage ? 'connected' : 'connected'}`;
+        badgeImg.innerText = isCustomImage ? `Custom: ${aiConfigState.customImage?.model || 'Active'}` : 'Default Aktif (Flux 8K)';
+      }
+    }
+
+    function openAISettingsModal() {
+      document.getElementById('ai-settings-modal').classList.add('show');
+
+      // Populate fields from aiConfigState
+      selectTextProvider(aiConfigState.textProvider || 'default');
+      selectImageProvider(aiConfigState.imageProvider || 'default');
+
+      document.getElementById('ai-custom-text-url').value = aiConfigState.customText?.baseUrl || 'https://api.openai.com/v1';
+      document.getElementById('ai-custom-text-model').value = aiConfigState.customText?.model || 'gpt-4o-mini';
+      document.getElementById('ai-custom-text-key').value = aiConfigState.customText?.apiKey || '';
+
+      document.getElementById('ai-custom-image-url').value = aiConfigState.customImage?.baseUrl || 'https://api.openai.com/v1';
+      document.getElementById('ai-custom-image-model').value = aiConfigState.customImage?.model || 'dall-e-3';
+      document.getElementById('ai-custom-image-key').value = aiConfigState.customImage?.apiKey || '';
+
+      // Clear feedback
+      hideTestFeedback('text');
+      hideTestFeedback('image');
+    }
+
+    function closeAISettingsModal() {
+      document.getElementById('ai-settings-modal').classList.remove('show');
+    }
+
+    function selectTextProvider(provider) {
+      aiConfigState.textProvider = provider;
+      const cardDefault = document.getElementById('card-text-default');
+      const cardCustom = document.getElementById('card-text-custom');
+      const panel = document.getElementById('panel-custom-text');
+
+      if (provider === 'default') {
+        cardDefault.classList.add('active');
+        cardCustom.classList.remove('active');
+        panel.style.display = 'none';
+      } else {
+        cardCustom.classList.add('active');
+        cardDefault.classList.remove('active');
+        panel.style.display = 'block';
+      }
+    }
+
+    function selectImageProvider(provider) {
+      aiConfigState.imageProvider = provider;
+      const cardDefault = document.getElementById('card-image-default');
+      const cardCustom = document.getElementById('card-image-custom');
+      const panel = document.getElementById('panel-custom-image');
+
+      if (provider === 'default') {
+        cardDefault.classList.add('active');
+        cardCustom.classList.remove('active');
+        panel.style.display = 'none';
+      } else {
+        cardCustom.classList.add('active');
+        cardDefault.classList.remove('active');
+        panel.style.display = 'block';
+      }
+    }
+
+    function applyAIPreset(name) {
+      const urlInput = document.getElementById('ai-custom-text-url');
+      const modelInput = document.getElementById('ai-custom-text-model');
+
+      if (name === 'openai') {
+        urlInput.value = 'https://api.openai.com/v1';
+        modelInput.value = 'gpt-4o-mini';
+      } else if (name === 'groq') {
+        urlInput.value = 'https://api.groq.com/openai/v1';
+        modelInput.value = 'llama-3.3-70b-versatile';
+      } else if (name === 'openrouter') {
+        urlInput.value = 'https://openrouter.ai/api/v1';
+        modelInput.value = 'openai/gpt-4o-mini';
+      } else if (name === 'deepseek') {
+        urlInput.value = 'https://api.deepseek.com/v1';
+        modelInput.value = 'deepseek-chat';
+      } else if (name === 'ollama') {
+        urlInput.value = 'http://localhost:11434/v1';
+        modelInput.value = 'llama3';
+      }
+      showToast(`Preset ${name.toUpperCase()} diterapkan ke form!`, 'info');
+    }
+
+    function syncImageCredentials() {
+      const syncChecked = document.getElementById('ai-sync-image-creds').checked;
+      if (syncChecked) {
+        document.getElementById('ai-custom-image-url').value = document.getElementById('ai-custom-text-url').value;
+        document.getElementById('ai-custom-image-key').value = document.getElementById('ai-custom-text-key').value;
+      }
+    }
+
+    function toggleKeyVisibility(inputId, btnId) {
+      const input = document.getElementById(inputId);
+      const btn = document.getElementById(btnId);
+      if (input.type === 'password') {
+        input.type = 'text';
+        btn.innerText = '🙈';
+      } else {
+        input.type = 'password';
+        btn.innerText = '👁️';
+      }
+    }
+
+    function hideTestFeedback(type) {
+      const fb = document.getElementById(`test-feedback-${type}`);
+      if (fb) {
+        fb.className = 'test-feedback';
+        fb.style.display = 'none';
+        fb.innerText = '';
+      }
+    }
+
+    async function testAIConnectionAction(type) {
+      const fb = document.getElementById(`test-feedback-${type}`);
+      const btn = document.getElementById(type === 'text' ? 'btn-test-text-ai' : 'btn-test-image-ai');
+      const label = document.getElementById(type === 'text' ? 'btn-test-text-ai-label' : 'btn-test-image-ai-label');
+
+      btn.disabled = true;
+      label.innerText = '⏳ Menguji...';
+      fb.className = 'test-feedback loading';
+      fb.style.display = 'block';
+      fb.innerText = 'Sedang menghubungi API...';
+
+      let testConfig = {};
+      if (type === 'text') {
+        testConfig = {
+          textProvider: aiConfigState.textProvider,
+          customText: {
+            baseUrl: document.getElementById('ai-custom-text-url').value.trim(),
+            apiKey: document.getElementById('ai-custom-text-key').value.trim(),
+            model: document.getElementById('ai-custom-text-model').value.trim()
+          }
+        };
+      } else {
+        testConfig = {
+          imageProvider: aiConfigState.imageProvider,
+          customImage: {
+            baseUrl: document.getElementById('ai-custom-image-url').value.trim(),
+            apiKey: document.getElementById('ai-custom-image-key').value.trim(),
+            model: document.getElementById('ai-custom-image-model').value.trim()
+          }
+        };
+      }
+
+      try {
+        const res = await fetch('/api/ai/test', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ type, config: testConfig })
+        });
+        const data = await res.json();
+        if (data.success) {
+          fb.className = 'test-feedback success';
+          fb.innerHTML = `<b>✅ Berhasil:</b> ${escapeHtml(data.message)}<br><i style="font-size: 11px;">Respons: "${escapeHtml(data.preview || '')}"</i>`;
+        } else {
+          fb.className = 'test-feedback error';
+          fb.innerHTML = `<b>❌ Gagal:</b> ${escapeHtml(data.error || 'Terjadi kesalahan')}`;
+        }
+      } catch (err) {
+        fb.className = 'test-feedback error';
+        fb.innerHTML = `<b>❌ Error:</b> ${escapeHtml(err.message)}`;
+      } finally {
+        btn.disabled = false;
+        label.innerText = type === 'text' ? '🧪 Uji Koneksi Teks' : '🧪 Uji Koneksi Gambar';
+      }
+    }
+
+    async function saveAISettingsAction() {
+      const btn = document.getElementById('btn-save-ai-settings');
+      const label = document.getElementById('btn-save-ai-settings-label');
+      btn.disabled = true;
+      label.innerText = '⏳ Menyimpan...';
+
+      const payload = {
+        textProvider: aiConfigState.textProvider,
+        imageProvider: aiConfigState.imageProvider,
+        customText: {
+          baseUrl: document.getElementById('ai-custom-text-url').value.trim(),
+          apiKey: document.getElementById('ai-custom-text-key').value.trim(),
+          model: document.getElementById('ai-custom-text-model').value.trim()
+        },
+        customImage: {
+          baseUrl: document.getElementById('ai-custom-image-url').value.trim(),
+          apiKey: document.getElementById('ai-custom-image-key').value.trim(),
+          model: document.getElementById('ai-custom-image-model').value.trim()
+        }
+      };
+
+      try {
+        const res = await fetch('/api/ai/config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.success) {
+          aiConfigState = data.config;
+          updateAIBadges();
+          closeAISettingsModal();
+          showToast('✅ Pengaturan AI berhasil disimpan!', 'success');
+        } else {
+          showToast('Gagal menyimpan: ' + data.error, 'error');
+        }
+      } catch (err) {
+        showToast('Error: ' + err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        label.innerText = '💾 Simpan Pengaturan';
+      }
+    }
+
+    async function resetAIDefaultsAction() {
+      if (!confirm('Kembalikan pengaturan AI ke mode Default (Pollinations AI - Bebas Kuota)?')) return;
+
+      selectTextProvider('default');
+      selectImageProvider('default');
+      await saveAISettingsAction();
+      showToast('Engine AI telah dikembalikan ke mode Default', 'info');
+    }
+
+    loadStatus();
+    loadAIConfig();
+  </script>
+</body>
+</html>

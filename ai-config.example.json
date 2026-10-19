@@ -1,0 +1,15 @@
+{
+  "textProvider": "default",
+  "imageProvider": "default",
+  "customText": {
+    "baseUrl": "https://api.openai.com/v1",
+    "apiKey": "",
+    "model": "gpt-4o-mini",
+    "temperature": 0.7
+  },
+  "customImage": {
+    "baseUrl": "https://api.openai.com/v1",
+    "apiKey": "",
+    "model": "dall-e-3"
+  }
+}

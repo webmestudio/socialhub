@@ -1,0 +1,34 @@
+[
+  {
+    "name": "SID",
+    "value": "your_youtube_sid_cookie_here",
+    "domain": ".youtube.com",
+    "path": "/",
+    "secure": false,
+    "httpOnly": false
+  },
+  {
+    "name": "HSID",
+    "value": "your_youtube_hsid_cookie_here",
+    "domain": ".youtube.com",
+    "path": "/",
+    "secure": false,
+    "httpOnly": true
+  },
+  {
+    "name": "SSID",
+    "value": "your_youtube_ssid_cookie_here",
+    "domain": ".youtube.com",
+    "path": "/",
+    "secure": true,
+    "httpOnly": true
+  },
+  {
+    "name": "LOGIN_INFO",
+    "value": "your_youtube_login_info_cookie_here",
+    "domain": ".youtube.com",
+    "path": "/",
+    "secure": true,
+    "httpOnly": true
+  }
+]

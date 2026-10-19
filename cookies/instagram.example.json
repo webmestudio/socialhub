@@ -1,0 +1,26 @@
+[
+  {
+    "name": "sessionid",
+    "value": "your_instagram_sessionid_here",
+    "domain": ".instagram.com",
+    "path": "/",
+    "secure": true,
+    "httpOnly": true
+  },
+  {
+    "name": "ds_user_id",
+    "value": "your_instagram_user_id_here",
+    "domain": ".instagram.com",
+    "path": "/",
+    "secure": true,
+    "httpOnly": false
+  },
+  {
+    "name": "csrftoken",
+    "value": "your_instagram_csrftoken_here",
+    "domain": ".instagram.com",
+    "path": "/",
+    "secure": true,
+    "httpOnly": false
+  }
+]
