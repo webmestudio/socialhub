@@ -65,6 +65,7 @@ npx playwright install chromium
   - Riwayat postingan (History) real-time.
 - **One-Click Launchers (Windows)**:
   - `Buka Dashboard.bat`: Membuka server dan web dashboard di browser.
+  - `CEK_COOKIE.bat`: Memeriksa status masa aktif dan verifikasi login sesi cookie langsung dari terminal.
   - `POSTING.bat`: Prompt interaktif untuk posting teks/status cepat (Threads, Twitter, Facebook, LinkedIn).
   - `POSTING_MEDIA.bat`: Prompt interaktif untuk posting foto/video (Instagram, TikTok, YouTube, dll).
 
@@ -87,7 +88,7 @@ socialhub/
 │   ├── tiktok.example.json
 │   └── youtube.example.json
 ├── public/
-│   └── index.html             <-- Web Dashboard UI lokal
+│   └── index.html             <-- Web Dashboard UI lokal (dilengkapi tombol Tes Cookie)
 ├── src/
 │   ├── platforms/
 │   │   ├── threads.js         <-- Otomasi Threads
@@ -100,6 +101,7 @@ socialhub/
 │   │   └── youtube.js         <-- Otomasi YouTube Studio Video Upload
 │   ├── utils/
 │   │   ├── ai-helper.js       <-- Integrasi Pollinations AI & OpenAI API
+│   │   ├── cookie-checker.js  <-- Pemeriksa masa aktif & verifikasi login Playwright
 │   │   └── cookie-helper.js   <-- Normalisasi format cookie Playwright
 │   ├── server.js              <-- Backend Express API & static server
 │   └── cli.js                 <-- CLI script
@@ -108,6 +110,7 @@ socialhub/
 ├── .gitignore                 <-- Pengabaian file kredensial & node_modules
 ├── ai-config.example.json     <-- Template konfigurasi AI
 ├── Buka Dashboard.bat         <-- Launcher Dashboard Web
+├── CEK_COOKIE.bat             <-- Launcher Pemeriksa Status Cookie
 ├── POSTING.bat                <-- Launcher posting teks (Threads, X, FB, LinkedIn)
 ├── POSTING_MEDIA.bat          <-- Launcher posting foto/video (Instagram, TikTok, YouTube, dll)
 ├── package.json
@@ -132,7 +135,7 @@ Otomasi ini menggunakan cookie sesi dari browser Anda.
    - YouTube: `studio.youtube.com`
 3. Klik ikon ekstensi **Cookie-Editor** -> klik **Export** -> pilih **Export as JSON**.
 4. Pasang cookie dengan salah satu cara berikut:
-   - **Lewat Web Dashboard (Paling Mudah)**: Buka dashboard di `http://localhost:3456`, pada panel *Manajemen Cookie*, klik tombol **+ Pasang / Update**, lalu paste JSON dan simpan.
+   - **Lewat Web Dashboard (Paling Mudah)**: Buka dashboard di `http://localhost:3456`, pada panel *Manajemen Cookie*, klik tombol **+ Pasang / Update**, lalu paste JSON dan simpan. Anda bisa langsung klik tombol **🔍 Tes** untuk menguji apakah sesi berhasil login!
    - **Lewat File Manual**: Simpan langsung ke folder `cookies/` dengan nama:
      - `cookies/threads.json`
      - `cookies/twitter.json`
@@ -143,6 +146,37 @@ Otomasi ini menggunakan cookie sesi dari browser Anda.
      - `cookies/youtube.json`
 
 *(Catatan: Cookie Facebook otomatis mencakup akses ke Facebook Page yang Anda kelola).*
+
+---
+
+## 🔍 Pemeriksaan Status & Validitas Cookie
+
+Anda dapat memeriksa apakah cookie masih aktif, mendekati kedaluwarsa, atau sudah expired tanpa harus melakukan posting terlebih dahulu:
+
+### Cara 1: Lewat Web Dashboard
+- Buka dashboard di `http://localhost:3456`.
+- Pada panel **🔑 Manajemen Cookie**, status masa berlaku cookie ditampilkan secara otomatis di samping setiap platform.
+- Klik tombol **🔍 Tes** pada akun tertentu untuk melakukan verifikasi login browser secara langsung.
+- Klik tombol **🧪 Tes Semua Cookie** di header card untuk menguji seluruh akun sekaligus.
+
+### Cara 2: Lewat Launcher Windows
+Klik ganda file:
+```
+CEK_COOKIE.bat
+```
+Pilih opsi **[1] Pengecekan Cepat** (instan) atau **[2] Pengecekan Live Browser** (uji login Playwright).
+
+### Cara 3: Lewat CLI Terminal
+```bash
+# Pengecekan masa aktif dan kelengkapan cookie (instan):
+node src/cli.js --check-cookies
+
+# Pengecekan live browser (menguji apakah sesi login masih valid):
+node src/cli.js --check-cookies --live
+
+# Pengecekan hanya untuk platform tertentu:
+node src/cli.js --check-cookies --platforms twitter,threads --live
+```
 
 ---
 
@@ -188,6 +222,12 @@ node src/cli.js --text "Cek artikel terbaru kami" --link "https://contoh.com" --
 - `--ai-text`    : Generate teks postingan otomatis dengan AI berdasarkan topik.
 - `--ai-image`   : Generate gambar visual otomatis dengan AI berdasarkan prompt.
 - `--ai-bundle`  : Generate teks dan gambar serasi sekaligus dalam 1 perintah.
+- `--check-cookies`, `-c`: Memeriksa kelengkapan dan masa berlaku cookie sesi.
+- `--live`       : Mengaktifkan pengujian login nyata ke browser Playwright saat cek cookie.
+- `--link`, `-l` : Tautan / URL yang ingin dilampirkan.
+- `--media`, `-m`: Path file gambar atau video lokal.
+- `--platforms`, `-p`: Daftar platform yang dituju dipisahkan koma (`threads`, `twitter`, `facebook`, `facebook_page`, `linkedin`, `instagram`, `tiktok`, `youtube`).
+- `--visible`, `--no-headless`: Menampilkan jendela browser saat proses automasi berjalan.
 - `--link`, `-l` : Tautan / URL yang ingin dilampirkan.
 - `--media`, `-m`: Path file gambar atau video lokal.
 - `--platforms`, `-p`: Daftar platform yang dituju dipisahkan koma (`threads`, `twitter`, `facebook`, `facebook_page`, `linkedin`, `instagram`, `tiktok`, `youtube`).

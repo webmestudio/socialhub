@@ -11,6 +11,7 @@ import { postToTikTok } from './platforms/tiktok.js';
 import { postToLinkedIn } from './platforms/linkedin.js';
 import { postToYouTube } from './platforms/youtube.js';
 import { generateAIText, generateAIImage } from './utils/ai-helper.js';
+import { analyzeCookie, verifyCookieLive } from './utils/cookie-checker.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -29,6 +30,8 @@ async function main() {
   let aiTopic = null;
   let aiImagePrompt = null;
   let aiBundle = null;
+  let checkCookies = false;
+  let liveCheck = false;
 
   for (let i = 0; i < args.length; i++) {
     if (args[i] === '--text' || args[i] === '-t') {
@@ -48,7 +51,68 @@ async function main() {
       aiImagePrompt = args[++i];
     } else if (args[i] === '--ai-bundle') {
       aiBundle = args[++i];
+    } else if (args[i] === '--check-cookies' || args[i] === '--check' || args[i] === '-c') {
+      checkCookies = true;
+    } else if (args[i] === '--live') {
+      liveCheck = true;
     }
+  }
+
+  // Handle Cookie Checking
+  if (checkCookies) {
+    console.log('\n=============================================================');
+    console.log('         🔍 SOCIALHUB - PEMERIKSA STATUS COOKIE');
+    console.log('=============================================================');
+
+    const checkList = userSpecifiedPlatforms && targetPlatforms.length > 0
+      ? targetPlatforms
+      : ['threads', 'twitter', 'facebook', 'facebook_page', 'linkedin', 'instagram', 'tiktok', 'youtube'];
+
+    let browser = null;
+    if (liveCheck) {
+      console.log('🚀 Mode Live Browser Check aktif (membuka Playwright)...');
+      try {
+        browser = await chromium.launch({
+          headless: !!headless,
+          channel: 'msedge'
+        }).catch(() => chromium.launch({ headless: !!headless }));
+      } catch (err) {
+        console.warn('⚠ Gagal membuka browser Playwright:', err.message);
+      }
+    }
+
+    for (const p of checkList) {
+      const isFbPage = p === 'facebook_page' || p === 'fb_page';
+      const cookieFile = isFbPage ? 'facebook.json' : `${p}.json`;
+      const cookiePath = path.join(COOKIES_DIR, cookieFile);
+      const analysis = analyzeCookie(p, cookiePath);
+
+      console.log(`\n📌 Platform: [${p.toUpperCase()}]`);
+      console.log(`   Status      : ${analysis.badge}`);
+      console.log(`   File Cookie : cookies/${cookieFile} (${analysis.cookieCount} cookies)`);
+      console.log(`   Detail      : ${analysis.message}`);
+
+      if (liveCheck && browser && analysis.exists) {
+        process.stdout.write(`   Verifikasi Live Browser... `);
+        const liveRes = await verifyCookieLive(browser, p, cookiePath);
+        if (liveRes.success) {
+          console.log(`✔ BERHASIL (${liveRes.message})`);
+        } else {
+          console.log(`✖ GAGAL (${liveRes.message})`);
+        }
+      }
+    }
+
+    if (browser) {
+      await browser.close().catch(() => {});
+    }
+
+    console.log('\n=============================================================');
+    console.log('💡 Tips:');
+    console.log(' - Jalankan dengan flag "--live" untuk tes verifikasi browser nyata.');
+    console.log(' - Contoh: node src/cli.js --check-cookies --live');
+    console.log('=============================================================\n');
+    return;
   }
 
   // Handle AI generation if requested via CLI flags

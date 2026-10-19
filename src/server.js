@@ -13,6 +13,7 @@ import { postToTikTok } from './platforms/tiktok.js';
 import { postToLinkedIn } from './platforms/linkedin.js';
 import { postToYouTube } from './platforms/youtube.js';
 import { generateAIText, generateAIImage, getAIConfig, saveAIConfig, testAIConnection } from './utils/ai-helper.js';
+import { analyzeCookie, verifyCookieLive } from './utils/cookie-checker.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -65,7 +66,7 @@ function saveHistory(entry) {
   fs.writeFileSync(HISTORY_FILE, JSON.stringify(history, null, 2));
 }
 
-// 1. API: Cek status cookie akun
+// 1. API: Cek status cookie akun (dilengkapi analisis expiry & kelengkapan token)
 app.get('/api/status', (req, res) => {
   const platforms = ['threads', 'twitter', 'facebook', 'instagram', 'tiktok', 'linkedin', 'youtube'];
   const status = {};
@@ -73,33 +74,35 @@ app.get('/api/status', (req, res) => {
   platforms.forEach(p => {
     const file = path.join(COOKIES_DIR, `${p}.json`);
     const exists = fs.existsSync(file);
-    let count = 0;
+    const analysis = analyzeCookie(p, file);
     let updatedAt = null;
 
     if (exists) {
       try {
-        const data = JSON.parse(fs.readFileSync(file, 'utf-8'));
-        count = Array.isArray(data) ? data.length : 0;
         const stat = fs.statSync(file);
         updatedAt = stat.mtime;
       } catch {
-        count = 0;
+        // ignore
       }
     }
 
     status[p] = {
-      connected: exists && count > 0,
-      cookieCount: count,
-      updatedAt
+      connected: exists && analysis.cookieCount > 0,
+      cookieCount: analysis.cookieCount,
+      updatedAt,
+      analysis
     };
   });
 
   // facebook_page shares the facebook.json cookie
+  const fbFile = path.join(COOKIES_DIR, 'facebook.json');
+  const fbAnalysis = analyzeCookie('facebook_page', fbFile);
   status['facebook_page'] = {
     connected: status['facebook'].connected,
     cookieCount: status['facebook'].cookieCount,
     updatedAt: status['facebook'].updatedAt,
-    pageName: 'Webme Studio'
+    pageName: 'Webme Studio',
+    analysis: fbAnalysis
   };
 
   res.json({ success: true, platforms: status, history: getHistory() });
@@ -126,7 +129,12 @@ app.post('/api/cookie/:platform', (req, res) => {
 
     const filePath = path.join(COOKIES_DIR, `${platform}.json`);
     fs.writeFileSync(filePath, JSON.stringify(parsed, null, 2), 'utf-8');
-    res.json({ success: true, message: `Cookie ${platform} berhasil disimpan!` });
+    const analysis = analyzeCookie(platform, filePath);
+    res.json({
+      success: true,
+      message: `Cookie ${platform} berhasil disimpan! (${parsed.length} cookie)`,
+      analysis
+    });
   } catch (err) {
     res.status(400).json({ error: 'JSON Cookie tidak valid: ' + err.message });
   }
@@ -140,6 +148,79 @@ app.delete('/api/cookie/:platform', (req, res) => {
     fs.unlinkSync(filePath);
   }
   res.json({ success: true, message: `Cookie ${platform} berhasil dihapus` });
+});
+
+// 3.1 API: Cek Validitas Cookie Live (Browser Verification) per Platform
+app.post('/api/cookie/check/:platform', async (req, res) => {
+  const platform = req.params.platform.toLowerCase();
+  const validPlatforms = ['threads', 'twitter', 'facebook', 'facebook_page', 'instagram', 'tiktok', 'linkedin', 'youtube'];
+  if (!validPlatforms.includes(platform)) {
+    return res.status(400).json({ error: 'Platform tidak valid' });
+  }
+
+  const cookieFile = platform === 'facebook_page' ? 'facebook.json' : `${platform}.json`;
+  const cookiePath = path.join(COOKIES_DIR, cookieFile);
+
+  if (!fs.existsSync(cookiePath)) {
+    return res.status(404).json({ success: false, message: 'File cookie belum terpasang' });
+  }
+
+  let browser;
+  try {
+    browser = await chromium.launch({
+      headless: true,
+      channel: 'msedge'
+    }).catch(() => chromium.launch({ headless: true }));
+  } catch (err) {
+    return res.status(500).json({ success: false, message: 'Gagal membuka browser Playwright: ' + err.message });
+  }
+
+  try {
+    const checkResult = await verifyCookieLive(browser, platform, cookiePath);
+    res.json(checkResult);
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Gagal verifikasi: ' + err.message });
+  } finally {
+    if (browser) await browser.close().catch(() => {});
+  }
+});
+
+// 3.2 API: Cek Validitas Semua Cookie yang Terpasang (Live Browser Verification)
+app.post('/api/cookie/check-all', async (req, res) => {
+  const platforms = ['threads', 'twitter', 'facebook', 'facebook_page', 'linkedin', 'instagram', 'tiktok', 'youtube'];
+  const targets = platforms.filter(p => {
+    const file = p === 'facebook_page' ? 'facebook.json' : `${p}.json`;
+    return fs.existsSync(path.join(COOKIES_DIR, file));
+  });
+
+  if (targets.length === 0) {
+    return res.json({ success: true, results: {}, message: 'Belum ada cookie yang terpasang' });
+  }
+
+  let browser;
+  try {
+    browser = await chromium.launch({
+      headless: true,
+      channel: 'msedge'
+    }).catch(() => chromium.launch({ headless: true }));
+  } catch (err) {
+    return res.status(500).json({ success: false, message: 'Gagal membuka browser Playwright: ' + err.message });
+  }
+
+  const results = {};
+  try {
+    for (const p of targets) {
+      const cookieFile = p === 'facebook_page' ? 'facebook.json' : `${p}.json`;
+      const cookiePath = path.join(COOKIES_DIR, cookieFile);
+      const r = await verifyCookieLive(browser, p, cookiePath);
+      results[p] = r;
+    }
+    res.json({ success: true, results });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  } finally {
+    if (browser) await browser.close().catch(() => {});
+  }
 });
 
 // 3a1. API: Ambil Konfigurasi AI

@@ -33,6 +33,7 @@ jobs:
         node --check src/server.js
         node --check src/cli.js
         node --check src/utils/cookie-helper.js
+        node --check src/utils/cookie-checker.js
         node --check src/utils/ai-helper.js
         node --check src/platforms/threads.js
         node --check src/platforms/twitter.js

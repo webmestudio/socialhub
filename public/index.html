@@ -430,7 +430,11 @@
     }
 
     .status-badge.connected { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+    .status-badge.warning { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
     .status-badge.disconnected { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+    .status-badge.checking { background: rgba(59, 130, 246, 0.25); color: #93c5fd; }
+    .status-badge.live-ok { background: rgba(16, 185, 129, 0.25); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.4); }
+    .status-badge.live-err { background: rgba(239, 68, 68, 0.25); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); }
 
     /* Modal Cookie */
     .modal-backdrop {
@@ -1191,8 +1195,11 @@
 
     <!-- Right Column: Account & Cookie Management -->
     <div class="card">
-      <div class="card-title">
+      <div class="card-title" style="display: flex; justify-content: space-between; align-items: center;">
         <span>🔑 Manajemen Cookie</span>
+        <button class="btn btn-secondary btn-sm" id="btn-check-all-cookies" onclick="checkAllCookiesLive()" title="Uji verifikasi sesi semua platform ke browser Playwright">
+          🧪 Tes Semua Cookie
+        </button>
       </div>
 
       <div id="accounts-list">
@@ -1919,6 +1926,10 @@ node src/cli.js --text "Testing browser" --visible</div>
       }
     }
 
+    // State pengecekan live cookie
+    let liveCheckResults = {};
+    let checkingPlatforms = new Set();
+
     function renderAccounts() {
       const container = document.getElementById('accounts-list');
       const textAccounts = [
@@ -1937,21 +1948,66 @@ node src/cli.js --text "Testing browser" --visible</div>
 
       const renderItems = (items) => items.map(item => {
         const p = platformsState[item.key] || { connected: false, cookieCount: 0 };
+        const analysis = p.analysis || {};
+        const liveRes = liveCheckResults[item.key];
+        const isChecking = checkingPlatforms.has(item.key);
+
+        let badgeClass = 'disconnected';
+        let badgeText = '○ Belum Ada Cookie';
+        let detailText = '';
+
+        if (isChecking) {
+          badgeClass = 'checking';
+          badgeText = '⏳ Sedang menguji live...';
+        } else if (liveRes) {
+          if (liveRes.success) {
+            badgeClass = 'live-ok';
+            badgeText = liveRes.username ? `✔ ${liveRes.username}` : '✔ Login Sesi Aktif';
+            detailText = liveRes.message || 'Terverifikasi live di browser';
+          } else {
+            badgeClass = 'live-err';
+            badgeText = '✖ Login Gagal / Kedaluwarsa';
+            detailText = liveRes.message || 'Gagal login';
+          }
+        } else if (p.connected) {
+          if (analysis.status === 'expired') {
+            badgeClass = 'disconnected';
+            badgeText = analysis.badge || '🔴 Kedaluwarsa';
+          } else if (analysis.status === 'expiring_soon' || analysis.status === 'missing_essential') {
+            badgeClass = 'warning';
+            badgeText = analysis.badge || '🟡 Perlu Dicek';
+          } else {
+            badgeClass = 'connected';
+            badgeText = analysis.badge || `● Terhubung (${p.cookieCount} cookies)`;
+          }
+          detailText = analysis.message || '';
+        }
+
         return `
-          <div class="account-item">
+          <div class="account-item" style="padding: 10px 12px; margin-bottom: 8px;">
             <div class="account-info">
               <div class="platform-icon ${item.class}">${item.icon}</div>
               <div>
                 <div class="account-name">${item.label}</div>
-                <span class="status-badge ${p.connected ? 'connected' : 'disconnected'}">
-                  ${p.connected ? '● Terhubung (' + p.cookieCount + ' cookies)' : '○ Belum Ada Cookie'}
-                </span>
+                <div style="margin-top: 2px;">
+                  <span class="status-badge ${badgeClass}">${badgeText}</span>
+                </div>
+                ${detailText ? `<div style="font-size: 11px; color: var(--muted); margin-top: 3px;">${escapeHtml(detailText)}</div>` : ''}
               </div>
             </div>
-            <div>
-              <button class="btn btn-secondary btn-sm" onclick="openCookieModal('${item.cookieKey}')">
-                ${p.connected ? 'Update' : '+ Pasang'}
-              </button>
+            <div style="display: flex; gap: 6px; align-items: center;">
+              ${p.connected ? `
+                <button class="btn btn-secondary btn-sm" onclick="checkSingleCookieLive('${item.key}')" ${isChecking ? 'disabled' : ''} title="Tes verifikasi sesi langsung ke browser Playwright">
+                  ${isChecking ? '⏳' : '🔍 Tes'}
+                </button>
+                <button class="btn btn-secondary btn-sm" onclick="openCookieModal('${item.cookieKey}')">
+                  Update
+                </button>
+              ` : `
+                <button class="btn btn-secondary btn-sm" onclick="openCookieModal('${item.cookieKey}')">
+                  + Pasang
+                </button>
+              `}
             </div>
           </div>
         `;
@@ -1968,6 +2024,66 @@ node src/cli.js --text "Testing browser" --visible</div>
         </div>
         ${renderItems(mediaAccounts)}
       `;
+    }
+
+    async function checkSingleCookieLive(platform) {
+      checkingPlatforms.add(platform);
+      renderAccounts();
+      showToast(`Sedang menguji login ${platform.toUpperCase()} di browser Playwright...`, 'info');
+
+      try {
+        const res = await fetch(`/api/cookie/check/${platform}`, { method: 'POST' });
+        const data = await res.json();
+        liveCheckResults[platform] = data;
+
+        if (data.success) {
+          showToast(`✔ ${platform.toUpperCase()}: ${data.message || 'Sesi login aktif!'}`, 'success');
+        } else {
+          showToast(`✖ ${platform.toUpperCase()}: ${data.message || 'Sesi login gagal/kedaluwarsa!'}`, 'error');
+        }
+      } catch (err) {
+        liveCheckResults[platform] = { success: false, message: 'Gagal koneksi ke server: ' + err.message };
+        showToast(`Gagal menguji ${platform}: ` + err.message, 'error');
+      } finally {
+        checkingPlatforms.delete(platform);
+        renderAccounts();
+      }
+    }
+
+    async function checkAllCookiesLive() {
+      const btn = document.getElementById('btn-check-all-cookies');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerText = '⏳ Menguji...';
+      }
+
+      showToast('Memulai pengujian verifikasi browser untuk semua platform terpasang...', 'info');
+
+      try {
+        const res = await fetch('/api/cookie/check-all', { method: 'POST' });
+        const data = await res.json();
+        if (data.success && data.results) {
+          Object.assign(liveCheckResults, data.results);
+          renderAccounts();
+
+          let okCount = 0;
+          let total = 0;
+          for (const k in data.results) {
+            total++;
+            if (data.results[k].success) okCount++;
+          }
+          showToast(`Selesai menguji ${total} platform (${okCount} aktif & login)`, okCount === total ? 'success' : 'info');
+        } else {
+          showToast(data.message || 'Gagal menjalankan pengujian', 'error');
+        }
+      } catch (err) {
+        showToast('Gagal menjalankan pengujian: ' + err.message, 'error');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerText = '🧪 Tes Semua Cookie';
+        }
+      }
     }
 
     function renderHistory(history) {
